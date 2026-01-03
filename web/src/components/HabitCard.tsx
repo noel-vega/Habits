@@ -32,7 +32,6 @@ function HabitGrid(props: { contributions: Map<number, Contribution> }) {
               {
                 "bg-blue-500": props.contributions.has(cell.day)
               }
-
             )} key={cell.day}></li>
         ))}
       </ul>
@@ -40,31 +39,35 @@ function HabitGrid(props: { contributions: Map<number, Contribution> }) {
   )
 }
 
+// the contributions map should not be the day of year
 function HabitDailyContributionButton(props: { habitId: number, contributions: Map<number, Contribution> }) {
   const { contributions } = props
-  const completed = contributions.has(getDayOfYear(new Date()))
+  const todaysContribution = contributions.get(getDayOfYear(new Date()))
 
   const createContributionMutation = useMutation({
-    mutationFn: createContribution
+    mutationFn: createContribution,
+    onSuccess: invalidateListHabits
   })
   const deleteContributionMutation = useMutation({
-    mutationFn: deleteContribution
+    mutationFn: deleteContribution,
+    onSuccess: invalidateListHabits
   })
 
   const handleToggleContribution = async () => {
-    const data = {
-      habitId: props.habitId,
-      date: new Date()
-    }
-    if (!completed) {
-      createContributionMutation.mutate(data, { onSuccess: invalidateListHabits })
+    if (!todaysContribution) {
+      createContributionMutation.mutate({
+        habitId: props.habitId,
+        date: new Date()
+      })
     } else {
-      deleteContributionMutation.mutate(data, { onSuccess: invalidateListHabits })
+      deleteContributionMutation.mutate({ id: todaysContribution.id })
     }
+
   }
-  return (<Button variant="outline" onClick={handleToggleContribution} className={cn({
-    "bg-blue-500 text-white hover:bg-blue-500 hover:text-white": completed
-  })}>
+  return (<Button variant="outline" onClick={handleToggleContribution}
+    className={cn({
+      "bg-blue-500 text-white hover:bg-blue-500 hover:text-white": !!todaysContribution
+    })}>
     <CheckIcon />
   </Button>)
 }
@@ -94,6 +97,9 @@ function HabitCard(props: { habit: Habit }) {
 export function HabitCardList() {
   const { data: habits } = useSuspenseQuery(getListHabitsQueryOptions())
   console.log("habits", habits)
+  if (habits.length === 0) {
+    return <div>No Habits</div>
+  }
   return (
     <ul className="space-y-4">
       {habits.map(habit => <li key={habit.id}>

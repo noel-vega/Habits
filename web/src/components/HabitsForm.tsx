@@ -22,7 +22,7 @@ export function CreateHabitForm(props: CreateHabitFormProps) {
     resolver: zodResolver(CreateHabitSchema),
     defaultValues: {
       name: "",
-      description: ""
+      description: "",
     }
   })
 
@@ -31,7 +31,7 @@ export function CreateHabitForm(props: CreateHabitFormProps) {
   })
 
   const handleSubmit = (e: FormEvent) => {
-    console.log("handle submit")
+    console.log("handle submit", form.formState.errors)
     form.handleSubmit(async data => {
       createHabitMutation.mutate(data, {
         onSuccess: (newHabit) => {

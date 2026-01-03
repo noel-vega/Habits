@@ -1,0 +1,62 @@
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+)
+
+type Habit struct {
+	ID          int       `json:"id" db:"id"`
+	Name        string    `json:"name" db:"name"`
+	Description string    `json:"description" db:"description"`
+	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt   time.Time `json:"updatedAt" db:"updated_at"`
+}
+
+type HabitWithContributions struct {
+	ID            int            `json:"id"`
+	Name          string         `json:"name"`
+	Description   string         `json:"description"`
+	Contributions []Contribution `json:"contributions"`
+}
+
+type CreateHabitParams struct {
+	Name        string `json:"name" db:"name"`
+	Description string `json:"description" db:"description"`
+}
+
+type HabitsRepo struct {
+	db *sqlx.DB
+}
+
+func (r *HabitsRepo) List() []Habit {
+	habits := []Habit{}
+	r.db.Select(&habits, "SELECT * FROM habits")
+	return habits
+}
+
+func (r *HabitsRepo) Create(params CreateHabitParams) (*Habit, error) {
+	query := `
+        INSERT INTO habits (name, description) 
+        VALUES ($1, $2)
+				RETURNING *
+    `
+	var habit Habit
+
+	fmt.Printf("%+v/n", params)
+
+	err := r.db.Get(&habit, query, params.Name, params.Description)
+	if err != nil {
+		return nil, err
+	}
+
+	return &habit, nil
+}
+
+func NewHabitsRepository(db *sqlx.DB) *HabitsRepo {
+	return &HabitsRepo{
+		db: db,
+	}
+}

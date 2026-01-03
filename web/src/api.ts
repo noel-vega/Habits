@@ -30,6 +30,7 @@ export async function createHabit(params: CreateHabit) {
     }
   })
   const data = await res.json()
+  console.log("new habit ...", data)
   return HabitSchema.parse(data)
 }
 
@@ -44,12 +45,8 @@ export async function createContribution(params: { habitId: number, date: Date }
   })
 }
 
-export async function deleteContribution(params: { habitId: number, date: Date }) {
-  await fetch(`/api/habits/${params.habitId}/contributions`, {
+export async function deleteContribution(params: { id: number }) {
+  await fetch(`/api/contributions/${params.id}`, {
     method: "DELETE",
-    body: JSON.stringify({ date: params.date.toISOString() }),
-    headers: {
-      "content-type": "application/json"
-    }
   })
 }
