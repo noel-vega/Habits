@@ -12,10 +12,12 @@ export const HabitSchema = z.object({
   name: z.string().min(1),
   description: z.string(),
   completionType: z.literal("step").or(z.literal("custom")),
-  contributions: ContributionSchema.array(),
 })
 export type Habit = z.infer<typeof HabitSchema>
 
-export const CreateHabitSchema = HabitSchema.omit({ id: true, contributions: true })
+export const HabitWithContributionsSchema = HabitSchema.merge(z.object({ contributions: ContributionSchema.array() }))
+export type HabitWithContributions = z.infer<typeof HabitWithContributionsSchema>
+
+export const CreateHabitSchema = HabitSchema.omit({ id: true })
 export type CreateHabit = z.infer<typeof CreateHabitSchema>
 
