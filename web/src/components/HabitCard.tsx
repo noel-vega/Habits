@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import type { Contribution, Habit } from "@/types";
+import type { Contribution, HabitWithContributions } from "@/types";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createContribution, deleteContribution, getListHabitsQueryOptions, invalidateListHabits } from "@/api";
 import { CheckIcon } from "lucide-react";
@@ -46,7 +46,7 @@ function HabitDailyContributionButton(props: { habitId: number, contributions: M
   </Button>)
 }
 
-function HabitCard(props: { habit: Habit }) {
+function HabitCard(props: { habit: HabitWithContributions }) {
   const { habit } = props
   const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
   return (

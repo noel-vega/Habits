@@ -1,11 +1,11 @@
 import { queryOptions } from "@tanstack/react-query"
-import { HabitSchema, type CreateHabit } from "./types"
+import { HabitWithContributionsSchema, type CreateHabit, type Habit } from "./types"
 import { queryClient } from "./lib/react-query"
 
 export async function getHabitById(params: { id: number }) {
   const res = await fetch(`/api/habits/${params.id}`)
   const data = await res.json()
-  return HabitSchema.parse(data)
+  return HabitWithContributionsSchema.parse(data)
 }
 
 export function getHabitByIdQueryOptions(params: { id: number }) {
@@ -18,7 +18,7 @@ export function getHabitByIdQueryOptions(params: { id: number }) {
 export async function listHabits() {
   const res = await fetch("/api/habits")
   const data = await res.json()
-  return HabitSchema.array().parse(data)
+  return HabitWithContributionsSchema.array().parse(data)
 }
 
 export function getListHabitsQueryOptions() {
@@ -42,8 +42,12 @@ export async function createHabit(params: CreateHabit) {
     }
   })
   const data = await res.json()
-  console.log("new habit ...", data)
-  return HabitSchema.parse(data)
+  return HabitWithContributionsSchema.parse(data)
+}
+
+
+export async function updateHabit(habit: Habit) {
+  console.log("Update habit", habit)
 }
 
 
@@ -56,6 +60,7 @@ export async function createContribution(params: { habitId: number, date: Date }
     }
   })
 }
+
 
 export async function deleteContribution(params: { id: number }) {
   await fetch(`/api/contributions/${params.id}`, {
