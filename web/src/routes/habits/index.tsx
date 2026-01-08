@@ -19,7 +19,7 @@ export const Route = createFileRoute('/habits/')({
 function RouteComponent() {
   return (
     <div className="px-3 md:px-0">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center py-8">
           <h1 className="text-2xl font-semibold">Habits</h1>
           <CreateHabitDialog>

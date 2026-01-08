@@ -32,7 +32,7 @@ function RouteComponent() {
 
 
   const contributions = new Map(habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
-  return <div className="max-w-7xl mx-auto">
+  return <div className="max-w-6xl mx-auto">
     <div>
       <div className="flex gap-8 items-center py-8">
         <BackButton to="/habits" />
