@@ -15,6 +15,10 @@ export function getHabitByIdQueryOptions(params: { id: number }) {
   })
 }
 
+export async function invalidateHabitById(id: number) {
+  return queryClient.invalidateQueries(getHabitByIdQueryOptions({ id }))
+}
+
 export async function listHabits() {
   const res = await fetch("/api/habits")
   const data = await res.json()
@@ -46,10 +50,17 @@ export async function createHabit(params: CreateHabit) {
 }
 
 
-export async function updateHabit(habit: Habit) {
-  console.log("Update habit", habit)
+export async function updateHabit(params: Habit) {
+  const { id, ...rest } = params
+  console.log("Update habit", params)
+  await fetch(`/api/habits/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(rest),
+    headers: {
+      "content-type": "application/json"
+    }
+  })
 }
-
 
 export async function createContribution(params: { habitId: number, date: Date }) {
   await fetch(`/api/habits/${params.habitId}/contributions`, {

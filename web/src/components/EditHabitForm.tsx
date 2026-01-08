@@ -1,17 +1,15 @@
-import { updateHabit } from "@/api"
+import { invalidateHabitById, updateHabit } from "@/api"
 import { HabitSchema, type Habit } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
-import { useState, type FormEvent } from "react"
+import { type FormEvent, type PropsWithChildren } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldSet, FieldTitle } from "./ui/field"
 import { Input } from "./ui/input"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { Button } from "./ui/button"
-import { PlusIcon } from "lucide-react"
-
-
+import { useDialog } from "@/hooks"
 
 type EditHabitFormProps =
   {
@@ -33,6 +31,7 @@ export function EditHabitForm(props: EditHabitFormProps) {
     form.handleSubmit(async data => {
       updateHabitMutation.mutate(data, {
         onSuccess: () => {
+          invalidateHabitById(data.id)
           props.onSubmit()
         }, onError: (e) => {
           console.log("Could not create habit", e.message)
@@ -122,9 +121,6 @@ export function EditHabitForm(props: EditHabitFormProps) {
         )}
       />
 
-
-
-
       <div className="justify-end gap-3 flex">
         <Button type="button" variant="outline" onClick={handleCancel}>Cancel</Button>
         <Button type="submit">Save</Button>
@@ -134,18 +130,21 @@ export function EditHabitForm(props: EditHabitFormProps) {
   )
 }
 
-export function EditHabitDialog(props: { habit: Habit }) {
-  const [open, setOpen] = useState(false)
-  const closeDialog = () => setOpen(false)
-
+export function EditHabitDialog(props: { habit: Habit } & PropsWithChildren) {
+  const { open, setOpen, close } = useDialog()
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button><PlusIcon />Add Habit</Button>
+        {props.children}
       </DialogTrigger>
-      <DialogContent>
-        <DialogTitle>Edit Habit</DialogTitle>
-        <EditHabitForm habit={props.habit} onSubmit={closeDialog} onCancel={closeDialog} />
+      <DialogContent onOpenAutoFocus={e => e.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle>Edit Habit</DialogTitle>
+          <DialogDescription>
+            View and edit your habit settings.
+          </DialogDescription>
+        </DialogHeader>
+        <EditHabitForm habit={props.habit} onSubmit={close} onCancel={close} />
       </DialogContent>
     </Dialog>
   )

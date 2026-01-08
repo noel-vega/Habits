@@ -92,6 +92,21 @@ func main() {
 		c.JSON(http.StatusOK, habitWithContributions)
 	})
 
+	r.PATCH("/habits/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		params := UpdateHabitParams{ID: id}
+		c.Bind(&params)
+		err = repo.Habits.Update(params)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
+	})
+
 	r.POST("/habits", func(c *gin.Context) {
 		var data CreateHabitParams
 		c.Bind(&data)

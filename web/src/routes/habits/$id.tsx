@@ -1,13 +1,13 @@
 import { getHabitByIdQueryOptions } from '@/api'
+import { BackButton } from '@/components/BackButton'
 import { ContributionsGrid } from '@/components/ContributionsGrid'
+import { EditHabitDialog } from '@/components/EditHabitForm'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { queryClient } from '@/lib/react-query'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { getDayOfYear } from 'date-fns/getDayOfYear'
-import { MoveLeftIcon, SettingsIcon } from 'lucide-react'
-import type { PropsWithChildren } from 'react'
+import { PlusIcon } from 'lucide-react'
 import z from 'zod/v3'
 
 export const Route = createFileRoute('/habits/$id')({
@@ -32,18 +32,13 @@ function RouteComponent() {
   return <div className="max-w-7xl mx-auto">
     <div>
       <div className="flex gap-8 items-center py-8">
-        <Link to="/habits">
-          <Button variant="outline" size="icon">
-            <MoveLeftIcon />
-          </Button>
-        </Link>
+        <BackButton to="/habits" />
         <h2 className="text-2xl font-semibold">{habit.name}</h2>
-        <HabitSettingsDialog>
-          <Button variant="secondary" className="border ml-auto">
-            <SettingsIcon />
-            Settings
+        <EditHabitDialog habit={habit}>
+          <Button className="ml-auto">
+            <PlusIcon /> <span>Add Habit</span>
           </Button>
-        </HabitSettingsDialog>
+        </EditHabitDialog>
       </div>
       <p>{!habit.description ? "No Description" : habit.description}</p>
     </div>
@@ -53,28 +48,3 @@ function RouteComponent() {
   </div>
 }
 
-
-export function HabitSettingsDialog(props: PropsWithChildren) {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        {props.children}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Habit Settings</DialogTitle>
-          <DialogDescription>
-            View and edit your habit settings.
-          </DialogDescription>
-          <div>
-
-          </div>
-          <DialogFooter>
-            <Button>Save</Button>
-          </DialogFooter>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-
-  )
-}

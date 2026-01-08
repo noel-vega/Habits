@@ -30,6 +30,13 @@ type CreateHabitParams struct {
 	CompletionType string `json:"completionType" db:"completion_type"`
 }
 
+type UpdateHabitParams struct {
+	ID             int    `json:"id" db:"id"`
+	Name           string `json:"name" db:"name"`
+	Description    string `json:"description" db:"description"`
+	CompletionType string `json:"completionType" db:"completion_type"`
+}
+
 type HabitsRepo struct {
 	db *sqlx.DB
 }
@@ -65,6 +72,21 @@ func (r *HabitsRepo) Create(params CreateHabitParams) (*Habit, error) {
 	}
 
 	return &habit, nil
+}
+
+func (r *HabitsRepo) Update(params UpdateHabitParams) error {
+	query := `
+		UPDATE habits 
+	  SET name = :name, description = :description, completion_type = :completion_type 
+	  WHERE ID = :id 
+	`
+	fmt.Printf("%+v/n", params)
+	_, err := r.db.NamedExec(query, params)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewHabitsRepository(db *sqlx.DB) *HabitsRepo {
