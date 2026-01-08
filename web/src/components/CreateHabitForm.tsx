@@ -1,16 +1,16 @@
 import { CreateHabitSchema } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState, type FormEvent } from "react"
+import { type FormEvent, type PropsWithChildren } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldSet, FieldTitle } from "./ui/field"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog"
-import { PlusIcon } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { createHabit, getListHabitsQueryOptions } from "@/api"
 import { queryClient } from "@/lib/react-query"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { useDialog } from "@/hooks"
 
 
 type CreateHabitFormProps =
@@ -141,18 +141,17 @@ export function CreateHabitForm(props: CreateHabitFormProps) {
   )
 }
 
-export function CreateHabitDialog() {
-  const [open, setOpen] = useState(false)
-  const closeDialog = () => setOpen(false)
+export function CreateHabitDialog(props: PropsWithChildren) {
+  const { open, close, setOpen } = useDialog()
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button><PlusIcon />Add Habit</Button>
+        {props.children}
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Create Habit</DialogTitle>
-        <CreateHabitForm onSubmit={closeDialog} onCancel={closeDialog} />
+        <CreateHabitForm onSubmit={close} onCancel={close} />
       </DialogContent>
     </Dialog>
   )

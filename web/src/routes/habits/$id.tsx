@@ -7,8 +7,12 @@ import { queryClient } from '@/lib/react-query'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { getDayOfYear } from 'date-fns/getDayOfYear'
-import { PlusIcon } from 'lucide-react'
+import { EditIcon } from 'lucide-react'
 import z from 'zod/v3'
+
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+
 
 export const Route = createFileRoute('/habits/$id')({
   params: {
@@ -36,7 +40,7 @@ function RouteComponent() {
         <h2 className="text-2xl font-semibold">{habit.name}</h2>
         <EditHabitDialog habit={habit}>
           <Button className="ml-auto">
-            <PlusIcon /> <span>Add Habit</span>
+            <EditIcon /> <span>Edit Habit</span>
           </Button>
         </EditHabitDialog>
       </div>
@@ -44,6 +48,10 @@ function RouteComponent() {
     </div>
     <div className="py-4">
       <ContributionsGrid contributions={contributions} />
+    </div>
+
+    <div>
+      <DayPicker className='border' />
     </div>
   </div>
 }
