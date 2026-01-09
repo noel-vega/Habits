@@ -63,7 +63,6 @@ export async function updateHabit(params: Habit) {
 }
 
 export async function createContribution(params: { habitId: number, date: Date, completions: number }) {
-  console.log("create contribution")
   await fetch(`/api/habits/${params.habitId}/contributions`, {
     method: "POST",
     body: JSON.stringify({ date: params.date.toISOString(), completions: params.completions }),

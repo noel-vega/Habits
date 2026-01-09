@@ -1,18 +1,19 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import type { Contribution, HabitWithContributions } from "@/types";
+import type { Contribution, Habit, HabitWithContributions } from "@/types";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createContribution, deleteContribution, getListHabitsQueryOptions, invalidateListHabits } from "@/api";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, PlusIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { getDayOfYear } from "date-fns";
 import { Link } from "@tanstack/react-router";
 import { ContributionsGrid } from "./ContributionsGrid";
 import type { MouseEvent } from "react";
+import { CircularProgress } from "./ui/circle-progress";
 
 
 // the contributions map should not be the day of year
-function HabitDailyContributionButton(props: { habitId: number, contributions: Map<number, Contribution> }) {
+function HabitDailyContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
   const { contributions } = props
   const todaysContribution = contributions.get(getDayOfYear(new Date()))
 
@@ -30,14 +31,21 @@ function HabitDailyContributionButton(props: { habitId: number, contributions: M
     e.stopPropagation()
     if (!todaysContribution) {
       createContributionMutation.mutate({
-        habitId: props.habitId,
+        habitId: props.habit.id,
         date: new Date(),
         completions: 1,
       })
     } else {
       deleteContributionMutation.mutate({ id: todaysContribution.id })
     }
+  }
 
+
+  if (props.habit.completionsPerDay > 1) {
+    return <button className="cursor-pointer relative h-fit grid place-content-center" onClick={handleToggleContribution}>
+      <PlusIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />
+      <CircularProgress progress={!todaysContribution ? 0 : props.habit.completionsPerDay / (todaysContribution?.completions ?? 0)} size={50} strokeWidth={5} showPercentage={false} />
+    </button>
   }
   return (<Button variant="outline" onClick={handleToggleContribution}
     className={cn({
@@ -59,7 +67,7 @@ function HabitCard(props: { habit: HabitWithContributions }) {
           </CardTitle>
           <CardDescription>{habit.description}</CardDescription>
         </div>
-        <HabitDailyContributionButton habitId={habit.id} contributions={contributions} />
+        <HabitDailyContributionButton habit={habit} contributions={contributions} />
       </CardHeader>
       <CardContent className="px-3 xl:px-6">
         <div className="overflow-x-auto pb-4">
