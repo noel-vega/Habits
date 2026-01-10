@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import type { Contribution, Habit, HabitWithContributions } from "@/types";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createContribution, deleteContribution, getListHabitsQueryOptions, invalidateListHabits, updateContributionCompletions } from "@/api";
-import { CheckIcon, PlusIcon } from "lucide-react";
+import { CalendarIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { getDayOfYear } from "date-fns";
 import { Link } from "@tanstack/react-router";
@@ -11,11 +11,21 @@ import { ContributionsGrid } from "./ContributionsGrid";
 import type { MouseEvent } from "react";
 import { CircularProgress } from "./ui/circle-progress";
 import { Tooltip } from "react-tooltip";
+import { Badge } from "./ui/badge";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { FieldLabel } from "./ui/field";
+import { useDialog } from "@/hooks";
+import { Progress } from "./ui/progress";
+import { ButtonGroup } from "./ui/button-group";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { useForm } from "react-hook-form";
 
 
 // the contributions map should not be the day of year
-function HabitDailyContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
-  const { contributions } = props
+function HabitContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
+  const { open, setOpen } = useDialog()
+  const { habit, contributions } = props
   const todaysContribution = contributions.get(getDayOfYear(new Date()))
 
   const createContributionMutation = useMutation({
@@ -35,16 +45,20 @@ function HabitDailyContributionButton(props: { habit: Habit, contributions: Map<
   const handleContribution = async (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (habit.completionType === "custom") {
+      setOpen(true)
+      return
+    }
     if (!todaysContribution) {
       createContributionMutation.mutate({
-        habitId: props.habit.id,
+        habitId: habit.id,
         date: new Date(),
         completions: 1,
       })
       return
     }
 
-    if (todaysContribution.completions === props.habit.completionsPerDay) {
+    if (todaysContribution.completions === habit.completionsPerDay) {
       deleteContributionMutation.mutate({ id: todaysContribution.id })
     } else {
       updateCompletionsMutation.mutate({ contributionId: todaysContribution.id, completions: todaysContribution.completions + 1 })
@@ -52,10 +66,10 @@ function HabitDailyContributionButton(props: { habit: Habit, contributions: Map<
   }
 
 
-  if (props.habit.completionsPerDay > 1) {
-    const progress = !todaysContribution ? 0 : todaysContribution.completions / props.habit.completionsPerDay * 100
-    const tooltipId = `completions-habit-${props.habit.id}`
-    const tooltipContent = `${todaysContribution?.completions ?? 0} / ${props.habit.completionsPerDay}`
+  if (habit.completionsPerDay > 1) {
+    const progress = !todaysContribution ? 0 : todaysContribution.completions / habit.completionsPerDay * 100
+    const tooltipId = `completions-habit-${habit.id}`
+    const tooltipContent = `${todaysContribution?.completions ?? 0} / ${habit.completionsPerDay}`
     return (
       <>
         <Tooltip id={tooltipId} delayShow={500} />
@@ -67,11 +81,14 @@ function HabitDailyContributionButton(props: { habit: Habit, contributions: Map<
           {progress !== 100 ? (
             <PlusIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />
           ) : (
-
             <CheckIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-green-500" />
           )}
           <CircularProgress progress={progress} size={50} strokeWidth={5} showPercentage={false} />
         </button>
+
+        {todaysContribution && (
+          <CustomContributionCompletionsDialog habit={props.habit} contribution={todaysContribution} open={open} onOpenChange={setOpen} progress={progress} />
+        )}
       </>
     )
   }
@@ -81,6 +98,47 @@ function HabitDailyContributionButton(props: { habit: Habit, contributions: Map<
     })}>
     <CheckIcon />
   </Button>)
+}
+
+function CustomContributionCompletionsDialog(props: { contribution: Contribution; habit: Habit; progress: number; open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent onClick={e => e.stopPropagation()}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Badge variant="outline">
+              <CalendarIcon />
+              Today
+            </Badge>
+            <Badge variant="outline">{props.habit.name}</Badge>
+          </DialogTitle>
+          <Progress value={props.progress} className="h-3" />
+        </DialogHeader>
+        <FieldLabel>Completions</FieldLabel>
+
+        <ButtonGroup className="w-full" >
+          <Button variant="secondary"><MinusIcon /></Button>
+          <Input type="number" value={props.contribution.completions ?? 0} className="text-center" />
+          <Button variant="secondary"><PlusIcon /></Button>
+        </ButtonGroup>
+
+        <ToggleGroup type="single" className="w-full border divide-x" defaultValue="1">
+          <ToggleGroupItem value="1" className="flex-1">1</ToggleGroupItem>
+          <ToggleGroupItem value="5" className="flex-1">5</ToggleGroupItem>
+          <ToggleGroupItem value="10" className="flex-1">10</ToggleGroupItem>
+          <ToggleGroupItem value="25" className="flex-1">25</ToggleGroupItem>
+          <ToggleGroupItem value="50" className="flex-1">50</ToggleGroupItem>
+          <ToggleGroupItem value="100" className="flex-1">100</ToggleGroupItem>
+        </ToggleGroup>
+
+        <DialogFooter>
+          <Button variant="secondary" className="flex-1">Reset</Button>
+          <Button variant="secondary" className="flex-1">Fill Day</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+
 }
 
 function HabitCard(props: { habit: HabitWithContributions }) {
@@ -93,9 +151,10 @@ function HabitCard(props: { habit: HabitWithContributions }) {
           <CardTitle>
             {habit.name}
           </CardTitle>
+          <Badge>{habit.completionType}</Badge>
           <CardDescription>{habit.description}</CardDescription>
         </div>
-        <HabitDailyContributionButton habit={habit} contributions={contributions} />
+        <HabitContributionButton habit={habit} contributions={contributions} />
       </CardHeader>
       <CardContent className="px-3 xl:px-6">
         <div className="overflow-x-auto pb-4">
