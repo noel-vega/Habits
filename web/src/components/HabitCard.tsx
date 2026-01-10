@@ -2,28 +2,26 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { Contribution, Habit, HabitWithContributions } from "@/types";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createContribution, deleteContribution, getListHabitsQueryOptions, invalidateListHabits, updateContributionCompletions } from "@/api";
+import { createContribution, getListHabitsQueryOptions, invalidateListHabits, updateContributionCompletions } from "@/api";
 import { CalendarIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { getDayOfYear } from "date-fns";
 import { Link } from "@tanstack/react-router";
 import { ContributionsGrid } from "./ContributionsGrid";
-import { useState, type MouseEvent } from "react";
+import { useState, type ChangeEvent, type MouseEvent } from "react";
 import { CircularProgress } from "./ui/circle-progress";
 import { Tooltip } from "react-tooltip";
 import { Badge } from "./ui/badge";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { FieldLabel } from "./ui/field";
 import { useDialog } from "@/hooks";
 import { Progress } from "./ui/progress";
 import { ButtonGroup } from "./ui/button-group";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
-import { Controller, useForm } from "react-hook-form";
 import { useDebouncedCallback } from 'use-debounce';
 
-
-// the contributions map should not be the day of year
+// TODO: the contributions map should not be the day of year
 function HabitContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
   const { open, setOpen } = useDialog()
   const { habit, contributions } = props
@@ -97,7 +95,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
 }
 
 function CustomContributionCompletionsDialog(props: { contribution?: Contribution; habit: Habit; progress: number; open: boolean; onOpenChange: (open: boolean) => void }) {
-  const debounce = useDebouncedCallback(() => { }, 500,)
+  const [completions, setCompletions] = useState(props.contribution?.completions ?? 0)
   const [progress, setProgress] = useState(props.progress)
   const [incrementBy, setIncremetBy] = useState(1)
 
@@ -110,11 +108,30 @@ function CustomContributionCompletionsDialog(props: { contribution?: Contributio
     mutationFn: updateContributionCompletions,
     onSuccess: invalidateListHabits
   })
-  const form = useForm({
-    defaultValues: {
-      completions: props.contribution?.completions ?? 0
+
+  const debounce = useDebouncedCallback((completions: number) => {
+    if (!props.contribution) {
+      createContributionMutation.mutate({ habitId: props.habit.id, date: new Date(), completions })
+
+    } else {
+      updateCompletionsMutation.mutate({ contributionId: props.contribution.id, completions })
     }
-  })
+  }, 250)
+
+  const handleChange = (completions: number) => {
+    setCompletions(completions)
+    setProgress(completions / props.habit.completionsPerDay * 100)
+    debounce(completions)
+  }
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+    handleChange(e.currentTarget.valueAsNumber)
+
+  const handleComplete = () =>
+    handleChange(props.habit.completionsPerDay)
+
+  const handleReset = () =>
+    handleChange(0)
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -127,34 +144,31 @@ function CustomContributionCompletionsDialog(props: { contribution?: Contributio
             </Badge>
             <Badge variant="outline">{props.habit.name}</Badge>
           </DialogTitle>
-          <Progress value={props.progress} className="h-3" />
+          <DialogDescription className="hidden">
+            Todays Completions
+          </DialogDescription>
+          <Progress value={progress} className="h-3" />
         </DialogHeader>
         <FieldLabel>Completions</FieldLabel>
 
-        <Controller control={form.control} name="completions" render={({ field }) => (
-          <ButtonGroup className="w-full" >
-            <Button variant="secondary" onClick={() => {
-              const newValue = field.value - incrementBy
-              if (newValue < 0) {
-                field.onChange(0)
-              } else {
-                field.onChange(newValue)
-              }
-            }}><MinusIcon /></Button>
-            <Input type="number" className="text-center" {...field} />
-            <Button variant="secondary"
-              onClick={() => {
-                const newValue = field.value + incrementBy
-                if (newValue > props.habit.completionsPerDay) {
-                  field.onChange(props.habit.completionsPerDay)
-                } else {
-                  field.onChange(newValue)
-                }
-              }}>
-              <PlusIcon />
-            </Button>
-          </ButtonGroup>
-        )} />
+        <ButtonGroup className="w-full" >
+          <Button variant="secondary" onClick={() => {
+            const newValue = completions - incrementBy
+            const value = newValue < 0 ? 0 : newValue
+            handleChange(value)
+          }}>
+            <MinusIcon />
+          </Button>
+          <Input type="number" className="text-center" value={completions} onChange={handleInputChange} />
+          <Button variant="secondary"
+            onClick={() => {
+              const newValue = completions + incrementBy
+              const value = newValue > props.habit.completionsPerDay ? props.habit.completionsPerDay : newValue
+              handleChange(value)
+            }}>
+            <PlusIcon />
+          </Button>
+        </ButtonGroup>
 
         <ToggleGroup type="single" className="w-full border divide-x" defaultValue={incrementBy.toString()} onValueChange={(val) => setIncremetBy(Number(val))}>
           <ToggleGroupItem value="1" className="flex-1">1</ToggleGroupItem>
@@ -166,8 +180,8 @@ function CustomContributionCompletionsDialog(props: { contribution?: Contributio
         </ToggleGroup>
 
         <DialogFooter>
-          <Button variant="secondary" className="flex-1">Reset</Button>
-          <Button variant="secondary" className="flex-1">Complete</Button>
+          <Button variant="secondary" className="flex-1" onClick={handleReset}>Reset</Button>
+          <Button variant="secondary" className="flex-1" onClick={handleComplete}>Complete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
