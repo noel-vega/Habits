@@ -193,7 +193,7 @@ function HabitCard(props: { habit: HabitWithContributions }) {
   const { habit } = props
   const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
   return (
-    <Card className="pb-0 pt-4 xl:py-6 gap-3 xl:gap-6">
+    <Card className="pb-0 pt-4 xl:py-6 gap-3 xl:gap-6 shadow-none hover:shadow">
       <CardHeader className="flex px-3 xl:px-6">
         <div className="flex-1 space-y-2">
           <CardTitle>
