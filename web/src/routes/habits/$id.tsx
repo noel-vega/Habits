@@ -9,11 +9,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getDayOfYear } from 'date-fns/getDayOfYear'
 import { CheckIcon, EditIcon } from 'lucide-react'
 import z from 'zod/v3'
-import { type DayProps } from 'react-day-picker';
 
 import { Calendar } from '@/components/ui/calendar'
 import type { Contribution, HabitWithContributions } from '@/types'
-
 
 export const Route = createFileRoute('/habits/$id')({
   params: {
@@ -26,18 +24,6 @@ export const Route = createFileRoute('/habits/$id')({
   component: RouteComponent,
 })
 
-function CustomDayContent(props: DayProps) {
-  return (
-    <div className="relative">
-      <span>{props.day.date.getDate()}</span>
-      {/* Add your custom content here */}
-      {props.day.date.getDate() === 15 && (
-        <span className="absolute bottom-0 left-1/2 h-1 w-1 rounded-full bg-blue-500" />
-      )}
-    </div>
-  );
-}
-
 function RouteComponent() {
   const params = Route.useParams()
   const rtContext = Route.useRouteContext()
@@ -45,7 +31,7 @@ function RouteComponent() {
   const { data: habit } = useQuery({ ...getHabitByIdQueryOptions(params), initialData: rtContext.habit })
 
   const contributions = new Map(habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
-  return <div className="px-3 lg:px-0 max-w-6xl mx-auto">
+  return <div className="px-3 max-w-6xl mx-auto">
     <div>
       <div className="flex gap-8 items-center py-8">
         <BackButton to="/habits" />
@@ -59,7 +45,7 @@ function RouteComponent() {
       <p>{!habit.description ? "No Description" : habit.description}</p>
     </div>
 
-    <div className="py-4 mb-4">
+    <div className="py-4 mb-4 overflow-x-auto">
       <ContributionsGrid habit={habit} contributions={contributions} />
     </div>
     <HabitCalendar habit={habit} />

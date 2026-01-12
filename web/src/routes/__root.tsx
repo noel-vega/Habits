@@ -3,17 +3,22 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import "../index.css"
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
+import { queryClient } from '@/lib/react-query'
+import { getListHabitsQueryOptions } from '@/api'
 
 const RootLayout = () => (
   <>
-    <SidebarProvider>
-      <AppSidebar />
-      <main className="max-w-5xl w-full mx-auto">
-        <Outlet />
-      </main>
-    </SidebarProvider>
+    <Outlet />
     <TanStackRouterDevtools />
   </>
 )
 
-export const Route = createRootRoute({ component: RootLayout })
+export const Route = createRootRoute({
+  beforeLoad: async () => {
+    const initialHabits = await queryClient.ensureQueryData(getListHabitsQueryOptions())
+    return { initialHabits }
+  },
+
+
+  component: RootLayout
+})

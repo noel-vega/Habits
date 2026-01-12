@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { Contribution, Habit, HabitWithContributions } from "@/types";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createContribution, getListHabitsQueryOptions, invalidateListHabits, updateContributionCompletions } from "@/api";
+import { useMutation } from "@tanstack/react-query";
+import { createContribution, invalidateListHabits, updateContributionCompletions } from "@/api";
 import { CalendarIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { getDayOfYear } from "date-fns";
@@ -193,8 +193,8 @@ function HabitCard(props: { habit: HabitWithContributions }) {
   const { habit } = props
   const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
   return (
-    <Card className="pb-0 pt-4 xl:py-6 gap-3 xl:gap-6 shadow-none hover:shadow">
-      <CardHeader className="flex px-3 xl:px-6">
+    <Card className="shadow-none hover:shadow">
+      <CardHeader className="flex">
         <div className="flex-1 space-y-2">
           <CardTitle>
             {habit.name}
@@ -203,8 +203,8 @@ function HabitCard(props: { habit: HabitWithContributions }) {
         </div>
         <HabitContributionButton habit={habit} contributions={contributions} />
       </CardHeader>
-      <CardContent className="px-3 xl:px-6">
-        <div className="overflow-x-auto pb-4">
+      <CardContent>
+        <div className="overflow-x-auto">
           <ContributionsGrid habit={habit} contributions={contributions} />
         </div>
       </CardContent>
@@ -213,19 +213,18 @@ function HabitCard(props: { habit: HabitWithContributions }) {
 }
 
 
-export function HabitCardList() {
-  const { data: habits } = useSuspenseQuery(getListHabitsQueryOptions())
-  if (habits.length === 0) {
+export function HabitCardList(props: { habits: HabitWithContributions[] }) {
+  if (props.habits.length === 0) {
     return <div>No Habits</div>
   }
   return (
     <ul className="space-y-4">
-      {habits.map(habit => <li key={habit.id}>
+      {props.habits.map(habit => <li key={habit.id}>
         <Link key={habit.id} to="/habits/$id" params={{ id: habit.id }}>
           <HabitCard habit={habit} />
         </Link>
       </li>)}
     </ul>
   )
-
 }
+

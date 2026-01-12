@@ -16,7 +16,6 @@ export function generateCells() {
   return cells
 }
 
-
 export function ContributionsGrid(props: { habit: Habit; contributions: Map<number, Contribution> }) {
   const cells = generateCells()
   return (
@@ -30,7 +29,7 @@ export function ContributionsGrid(props: { habit: Habit; contributions: Map<numb
             data-tooltip-id="contrib-tooltip"
             data-tooltip-content={format(setDayOfYear(new Date(), cell.day), "MMMM do")}
             data-tooltip-place="top"
-            className={cn("h-[12px] w-[12px] rounded-[.18rem] border text-xs bg-secondary overflow-clip",
+            className={cn("h-[12px] w-[12px] rounded-[.18rem] border text-xs bg-secondary",
               {
                 "bg-[#c6e48b] border-[#c6e48b]": progress > 0,
                 "bg-[#7bc96f] border-[#7bc96f]": progress > 25,
