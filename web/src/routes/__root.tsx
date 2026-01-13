@@ -3,16 +3,18 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import "../index.css"
 import { queryClient } from '@/lib/react-query'
 import { getListHabitsQueryOptions } from '@/api'
-import { SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 
 const RootLayout = () => (
   <>
-    <SidebarProvider>
+    <SidebarProvider >
       <AppSidebar />
-      <Outlet />
+      <main className="w-full">
+        <SidebarTrigger>Menu</SidebarTrigger>
+        <Outlet />
+      </main>
     </SidebarProvider>
-    <TanStackRouterDevtools />
   </>
 )
 
