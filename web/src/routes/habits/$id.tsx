@@ -5,13 +5,18 @@ import { EditHabitDialog } from '@/components/EditHabitForm'
 import { Button } from '@/components/ui/button'
 import { queryClient } from '@/lib/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouteContext } from '@tanstack/react-router'
 import { getDayOfYear } from 'date-fns/getDayOfYear'
-import { CheckIcon, EditIcon } from 'lucide-react'
+import { CheckIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import z from 'zod/v3'
 
 import { Calendar } from '@/components/ui/calendar'
 import type { Contribution, HabitWithContributions } from '@/types'
+import { useState, type PropsWithChildren } from 'react'
+import { CustomContributionCompletionsDialog } from '@/components/HabitCard'
+import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
 export const Route = createFileRoute('/habits/$id')({
   params: {
@@ -24,6 +29,24 @@ export const Route = createFileRoute('/habits/$id')({
   component: RouteComponent,
 })
 
+function DeleteHabitDialog(props: {} & PropsWithChildren) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Habit</AlertDialogTitle>
+          <AlertDialogDescription>Permenantley delete this habit</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Delete</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
 function RouteComponent() {
   const params = Route.useParams()
   const rtContext = Route.useRouteContext()
@@ -31,29 +54,38 @@ function RouteComponent() {
   const { data: habit } = useQuery({ ...getHabitByIdQueryOptions(params), initialData: rtContext.habit })
 
   const contributions = new Map(habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
-  return <div className="px-3 max-w-6xl mx-auto">
-    <div>
-      <div className="flex gap-8 items-center py-8">
-        <BackButton to="/habits" />
-        <h2 className="text-2xl font-semibold">{habit.name}</h2>
-        <EditHabitDialog habit={habit}>
-          <Button className="ml-auto">
-            <EditIcon /> <span>Edit Habit</span>
-          </Button>
-        </EditHabitDialog>
+  return (
+    <div className="px-3 max-w-6xl w-full mx-auto">
+      <div>
+        <div className="flex gap-8 items-center py-8">
+          <BackButton to="/habits" />
+          <h2 className="text-2xl font-semibold">{habit.name}</h2>
+          <div className='space-x-2 ml-auto'>
+            <EditHabitDialog habit={habit}>
+              <Button className="ml-auto">
+                <EditIcon /> <span>Edit</span>
+              </Button>
+            </EditHabitDialog>
+            <DeleteHabitDialog>
+              <Button variant="destructive" size="icon"><Trash2Icon /></Button>
+            </DeleteHabitDialog>
+          </div>
+        </div>
+        <p>{!habit.description ? "No Description" : habit.description}</p>
       </div>
-      <p>{!habit.description ? "No Description" : habit.description}</p>
-    </div>
 
-    <div className="py-4 mb-4 overflow-x-auto">
-      <ContributionsGrid habit={habit} contributions={contributions} />
+      <div className="py-4 mb-4 overflow-x-auto">
+        <ContributionsGrid habit={habit} contributions={contributions} />
+      </div>
+      <HabitCalendar habit={habit} />
     </div>
-    <HabitCalendar habit={habit} />
-  </div>
+  )
 }
 
 export function HabitCalendar(props: { habit: HabitWithContributions }) {
+  const { today } = useRouteContext({ from: "__root__" })
   const { habit } = props
+  const [day, setDay] = useState<Date>(new Date())
 
   const createContributionMutation = useMutation({
     mutationFn: createContribution,
@@ -72,14 +104,11 @@ export function HabitCalendar(props: { habit: HabitWithContributions }) {
   })
 
   const handleContribution = async (params: { contribution: Contribution } | { contribution: undefined, date: Date }) => {
-    console.log("handle contribution")
     if (habit.completionType === "custom") {
-      console.log("custom dialog")
       // setOpen(true)
       return
     }
     if (!params.contribution) {
-      console.log("create contribution")
       createContributionMutation.mutate({
         habitId: habit.id,
         date: params.date,
@@ -89,54 +118,81 @@ export function HabitCalendar(props: { habit: HabitWithContributions }) {
     }
 
     if (params.contribution.completions === habit.completionsPerDay) {
-      console.log("reset")
       updateCompletionsMutation.mutate({ contributionId: params.contribution.id, completions: 0 })
     } else {
-      console.log("add 1")
       updateCompletionsMutation.mutate({ contributionId: params.contribution.id, completions: params.contribution.completions + 1 })
     }
   }
   const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
+  const [open, setOpen] = useState(false)
   return (
-    <Calendar
-      className="rounded-lg border shadow-sm w-full [--cell-size:theme(spacing.16)]"
-      classNames={{
-        weeks: "gap-2"
-      }}
-      components={{
-        DayButton: ({ day }) => {
-          const dayOfYear = getDayOfYear(day.date)
+    <>
+      <Calendar
+        className="rounded-lg border shadow-sm w-full [--cell-size:theme(spacing.16)]"
+        classNames={{
+          weeks: "gap-2"
+        }}
+        components={{
+          DayButton: ({ day }) => {
+            const dayOfYear = getDayOfYear(day.date)
+            const contribution = contributions.get(dayOfYear)
+            const progress = !contribution ? 0 : contribution.completions / habit.completionsPerDay * 100
+            return <>
+              <button disabled={day.date > today} className={cn("hover:bg-secondary hover:border-border gap-2 rounded border border-transparent h-full w-full flex flex-col cursor-pointer", {
+                "cursor-default": day.date > today
+              })} onClick={
+                () => {
+                  if (habit.completionType === 'custom') {
+                    setDay(day.date)
+                    setOpen(true)
+                    return
+                  }
+                  if (dayOfYear > getDayOfYear(new Date())) return
+
+                  if (!contribution) {
+                    handleContribution({ contribution, date: day.date })
+                  } else {
+                    handleContribution({ contribution })
+                  }
+                }
+              }>
+                <div className="flex-1 flex justify-center items-end">{day.date.getDate()}</div>
+                <div className="flex-1">
+                  {progress > 0 && (
+                    <>
+                      {progress === 100 ? (
+                        <div className="text-center">
+                          {contribution?.completions === habit.completionsPerDay && <CheckIcon className="text-green-500 mx-auto" />}
+                        </div>
+                      ) : (
+                        <div className="h-6 flex items-center">
+                          <Progress value={progress} className="w-3/4 mx-auto" />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </button>
+
+            </>
+          }
+        }}
+        onDayClick={(date) => {
+          const dayOfYear = getDayOfYear(date)
           const contribution = contributions.get(dayOfYear)
-          return <button className="hover:border-border rounded border border-transparent h-full w-full flex flex-col cursor-pointer" onClick={
-            () => {
-              if (dayOfYear > getDayOfYear(new Date())) return
+          console.log(contribution)
 
-              if (!contribution) {
-                handleContribution({ contribution, date: day.date })
-              } else {
-                handleContribution({ contribution })
-              }
-            }
-          }>
-            <div className="py-4">{day.date.getDate()}</div>
-            <div className="flex-1">
-              <div className="text-center">
-                {contribution?.completions === habit.completionsPerDay && <CheckIcon className="text-green-500 mx-auto" />}
-              </div>
+        }}
+      />
 
-            </div>
-
-
-          </button>
-        }
-      }}
-      onDayClick={(date) => {
-        const dayOfYear = getDayOfYear(date)
-        const contribution = contributions.get(dayOfYear)
-        console.log(contribution)
-
-      }}
-    />
+      <CustomContributionCompletionsDialog
+        habit={props.habit}
+        date={day}
+        contribution={contributions.get(getDayOfYear(day))}
+        open={open}
+        onOpenChange={setOpen}
+      />
+    </>
   )
 }
 

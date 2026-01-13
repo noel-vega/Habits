@@ -18,7 +18,7 @@ function RouteComponent() {
   const { initialHabits } = Route.useRouteContext()
   const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: initialHabits })
   return (
-    <div className="px-3 max-w-5xl mx-auto w-full">
+    <div className="px-3 max-w-6xl mx-auto w-full">
       <header className="flex justify-between items-center py-8">
         <h1 className="text-2xl font-semibold">Habits</h1>
         <CreateHabitDialog>

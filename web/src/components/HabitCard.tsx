@@ -2,13 +2,13 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { Contribution, Habit, HabitWithContributions } from "@/types";
 import { useMutation } from "@tanstack/react-query";
-import { createContribution, invalidateListHabits, updateContributionCompletions } from "@/api";
+import { createContribution, invalidateHabitById, invalidateListHabits, updateContributionCompletions } from "@/api";
 import { CalendarIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "./ui/button";
-import { getDayOfYear } from "date-fns";
+import { format, getDayOfYear } from "date-fns";
 import { Link } from "@tanstack/react-router";
 import { ContributionsGrid } from "./ContributionsGrid";
-import { useState, type ChangeEvent, type MouseEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type MouseEvent } from "react";
 import { CircularProgress } from "./ui/circle-progress";
 import { Tooltip } from "react-tooltip";
 import { Badge } from "./ui/badge";
@@ -81,8 +81,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
           )}
           <CircularProgress progress={progress} size={50} strokeWidth={5} showPercentage={false} />
         </button>
-
-        <CustomContributionCompletionsDialog habit={props.habit} contribution={todaysContribution} open={open} onOpenChange={setOpen} progress={progress} />
+        <CustomContributionCompletionsDialog date={new Date()} habit={props.habit} contribution={todaysContribution} open={open} onOpenChange={setOpen} />
       </>
     )
   }
@@ -94,33 +93,44 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
   </Button>)
 }
 
-function CustomContributionCompletionsDialog(props: { contribution?: Contribution; habit: Habit; progress: number; open: boolean; onOpenChange: (open: boolean) => void }) {
+export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; open: boolean; onOpenChange: (open: boolean) => void }) {
   const [completions, setCompletions] = useState(props.contribution?.completions ?? 0)
-  const [progress, setProgress] = useState(props.progress)
   const [incrementBy, setIncremetBy] = useState(1)
+  console.log(props.contribution)
 
   const createContributionMutation = useMutation({
     mutationFn: createContribution,
-    onSuccess: invalidateListHabits
+    onSuccess: () => {
+      invalidateListHabits()
+      invalidateHabitById(props.habit.id)
+    }
   })
 
   const updateCompletionsMutation = useMutation({
     mutationFn: updateContributionCompletions,
-    onSuccess: invalidateListHabits
+    onSuccess: () => {
+      invalidateListHabits()
+      invalidateHabitById(props.habit.id)
+    }
   })
+
+  useEffect(() => {
+    setCompletions(props.contribution?.completions ?? 0)
+  }, [props.contribution])
 
   const debounce = useDebouncedCallback((completions: number) => {
     if (!props.contribution) {
-      createContributionMutation.mutate({ habitId: props.habit.id, date: new Date(), completions })
+      console.log("create contribution")
+      createContributionMutation.mutate({ habitId: props.habit.id, date: props.date, completions })
 
     } else {
       updateCompletionsMutation.mutate({ contributionId: props.contribution.id, completions })
     }
   }, 250)
+  const progress = !props.contribution ? 0 : props.contribution.completions / props.habit.completionsPerDay * 100
 
   const handleChange = (completions: number) => {
     setCompletions(completions)
-    setProgress(completions / props.habit.completionsPerDay * 100)
     debounce(completions)
   }
 
@@ -140,7 +150,7 @@ function CustomContributionCompletionsDialog(props: { contribution?: Contributio
           <DialogTitle className="flex items-center gap-2">
             <Badge variant="outline">
               <CalendarIcon />
-              Today
+              {getDayOfYear(new Date()) === getDayOfYear(props.date) ? "Today" : format(props.date, "MMMM do")}
             </Badge>
             <Badge variant="outline">{props.habit.name}</Badge>
           </DialogTitle>
