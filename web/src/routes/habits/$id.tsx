@@ -1,11 +1,11 @@
-import { createContribution, getHabitByIdQueryOptions, invalidateHabitById, invalidateListHabits, updateContributionCompletions } from '@/api'
+import { createContribution, getHabitByIdQueryOptions, getListHabitsQueryOptions, invalidateHabitById, invalidateListHabits, updateContributionCompletions, useDeleteHabit } from '@/api'
 import { BackButton } from '@/components/BackButton'
 import { ContributionsGrid } from '@/components/ContributionsGrid'
 import { EditHabitDialog } from '@/components/EditHabitForm'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { queryClient } from '@/lib/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useRouteContext } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouteContext } from '@tanstack/react-router'
 import { getDayOfYear } from 'date-fns/getDayOfYear'
 import { CheckIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import z from 'zod/v3'
@@ -17,6 +17,7 @@ import { CustomContributionCompletionsDialog } from '@/components/HabitCard'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createFileRoute('/habits/$id')({
   params: {
@@ -29,7 +30,21 @@ export const Route = createFileRoute('/habits/$id')({
   component: RouteComponent,
 })
 
-function DeleteHabitDialog(props: {} & PropsWithChildren) {
+function DeleteHabitDialog(props: { habitId: number } & PropsWithChildren) {
+  const navigate = useNavigate()
+  const deleteHabit = useDeleteHabit()
+
+  const handleDelete = () => {
+    deleteHabit.mutate(props.habitId, {
+      onSuccess: async () => {
+        queryClient.setQueryData(getListHabitsQueryOptions().queryKey, (oldData) => {
+          return !oldData ? oldData : oldData.filter(x => x.id !== props.habitId)
+        })
+        await invalidateListHabits()
+        navigate({ to: "/habits" })
+      }
+    })
+  }
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
@@ -40,7 +55,9 @@ function DeleteHabitDialog(props: {} & PropsWithChildren) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Delete</AlertDialogAction>
+          <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>
+            {deleteHabit.isPending ? <Spinner /> : "Delete"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -66,7 +83,7 @@ function RouteComponent() {
                 <EditIcon /> <span>Edit</span>
               </Button>
             </EditHabitDialog>
-            <DeleteHabitDialog>
+            <DeleteHabitDialog habitId={habit.id}>
               <Button variant="destructive" size="icon"><Trash2Icon /></Button>
             </DeleteHabitDialog>
           </div>

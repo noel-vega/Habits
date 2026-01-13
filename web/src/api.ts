@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query"
+import { queryOptions, useMutation } from "@tanstack/react-query"
 import { HabitWithContributionsSchema, type CreateHabit, type Habit } from "./types"
 import { queryClient } from "./lib/react-query"
 
@@ -32,8 +32,8 @@ export function getListHabitsQueryOptions() {
   })
 }
 
-export function invalidateListHabits() {
-  queryClient.invalidateQueries(getListHabitsQueryOptions())
+export async function invalidateListHabits() {
+  return queryClient.invalidateQueries(getListHabitsQueryOptions())
 }
 
 export async function createHabit(params: CreateHabit) {
@@ -59,6 +59,24 @@ export async function updateHabit(params: Habit) {
     headers: {
       "content-type": "application/json"
     }
+  })
+}
+
+export async function deleteHabit(id: number) {
+  await fetch(`/api/habits/${id}`, {
+    method: "DELETE"
+  })
+}
+
+export function useDeleteHabit() {
+  return useMutation({
+    mutationFn: deleteHabit,
+    onMutate: (habitId) => {
+      queryClient.setQueryData(getListHabitsQueryOptions().queryKey, (oldData) => {
+        return !oldData ? oldData : oldData.filter(x => x.id !== habitId)
+      })
+    },
+
   })
 }
 
