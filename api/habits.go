@@ -90,10 +90,7 @@ func (r *HabitsRepo) Update(params UpdateHabitParams) error {
 }
 
 func (r *HabitsRepo) Delete(ID int) error {
-	query := `
-		DELETE FROM habits
-		WHERE id = $1;
-	`
+	query := `DELETE FROM habits WHERE id = $1;`
 	_, err := r.db.Exec(query, ID)
 	if err != nil {
 		return err

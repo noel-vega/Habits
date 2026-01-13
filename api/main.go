@@ -130,6 +130,20 @@ func main() {
 		})
 	})
 
+	r.DELETE("/habits/:habit_id", func(c *gin.Context) {
+		habitID, err := strconv.Atoi(c.Param("habit_id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		err = repo.Habits.Delete(habitID)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	})
+
 	r.POST("/habits/:habit_id/contributions", func(c *gin.Context) {
 		habitID, err := strconv.Atoi(c.Param("habit_id"))
 		if err != nil {
