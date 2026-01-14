@@ -37,9 +37,40 @@ func (r *TodosRepo) List() ([]Todo, error) {
 	return todos, nil
 }
 
-func (r *TodosRepo) Create() {}
+type CreateTodoParams struct {
+	Name        string `json:"name" db:"name"`
+	Status      string `json:"status" db:"status"`
+	Description string `json:"description" db:"description"`
+}
 
-func (r *TodosRepo) Update() {}
+func (r *TodosRepo) Create(params CreateTodoParams) error {
+	query := `
+		INSERT INTO todos (name, status, description) VALUES () 
+	`
+	_, err := r.DB.NamedExec(query, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type UpdateTodoParams struct {
+	Name        string `json:"name" db:"name"`
+	Status      string `json:"status" db:"status"`
+	Description string `json:"description" db:"description"`
+}
+
+func (r *TodosRepo) Update(params UpdateTodoParams) error {
+	query := `
+		UPDATE todos
+	  SET name = :name, status = :status, description = :description
+	`
+	_, err := r.DB.NamedExec(query, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func (r *TodosRepo) Delete(id int) error {
 	query := `
