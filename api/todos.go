@@ -73,9 +73,7 @@ func (r *TodosRepo) Update(params UpdateTodoParams) error {
 }
 
 func (r *TodosRepo) Delete(id int) error {
-	query := `
-		DELETE FROM todos WHERE id = $1
-	`
+	query := `DELETE FROM todos WHERE id = $1`
 	_, err := r.DB.Exec(query, id)
 	if err != nil {
 		return err

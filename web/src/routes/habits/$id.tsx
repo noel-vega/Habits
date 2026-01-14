@@ -1,4 +1,4 @@
-import { createContribution, getHabitByIdQueryOptions, getListHabitsQueryOptions, invalidateHabitById, invalidateListHabits, updateContributionCompletions, useDeleteHabit } from '@/api'
+import { createContribution, getHabitByIdQueryOptions, getListHabitsQueryOptions, invalidateHabitById, invalidateListHabits, updateContributionCompletions, useDeleteHabit } from '@/features/habits/api'
 import { BackButton } from '@/components/BackButton'
 import { ContributionsGrid } from '@/components/ContributionsGrid'
 import { EditHabitDialog } from '@/components/EditHabitForm'
@@ -11,13 +11,13 @@ import { CheckIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import z from 'zod/v3'
 
 import { Calendar } from '@/components/ui/calendar'
-import type { Contribution, HabitWithContributions } from '@/types'
 import { useState, type PropsWithChildren } from 'react'
 import { CustomContributionCompletionsDialog } from '@/components/HabitCard'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Spinner } from '@/components/ui/spinner'
+import type { Contribution, HabitWithContributions } from '@/features/habits/types'
 
 export const Route = createFileRoute('/habits/$id')({
   params: {

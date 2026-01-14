@@ -1,6 +1,6 @@
 import { queryOptions, useMutation } from "@tanstack/react-query"
 import { HabitWithContributionsSchema, type CreateHabit, type Habit } from "./types"
-import { queryClient } from "./lib/react-query"
+import { queryClient } from "@/lib/react-query"
 
 export async function getHabitById(params: { id: number }) {
   const res = await fetch(`/api/habits/${params.id}`)

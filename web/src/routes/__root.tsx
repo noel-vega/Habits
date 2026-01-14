@@ -1,9 +1,9 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import "../index.css"
 import { queryClient } from '@/lib/react-query'
-import { getListHabitsQueryOptions } from '@/api'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
+import { getListHabitsQueryOptions } from '@/features/habits/api'
 
 const RootLayout = () => (
   <>

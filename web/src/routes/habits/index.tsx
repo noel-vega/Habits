@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { HabitCardList } from '@/components/HabitCard'
-import { getListHabitsQueryOptions } from '@/api'
 import { CreateHabitDialog } from '@/components/CreateHabitForm'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { getListHabitsQueryOptions } from '@/features/habits/api'
 
 export const Route = createFileRoute('/habits/')({
   beforeLoad: () => {
