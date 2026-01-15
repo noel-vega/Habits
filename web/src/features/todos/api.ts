@@ -28,3 +28,9 @@ export async function createTodo(params: CreateTodo) {
     }
   })
 }
+
+export async function deleteTodo(params: { id: number }) {
+  await fetch(`/api/todos/${params.id}`, {
+    method: "DELETE",
+  })
+}

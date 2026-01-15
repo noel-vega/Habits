@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { getListTodosQueryOptions } from '@/features/todos/api'
+import { deleteTodo, getListTodosQueryOptions, invalidateListTodosQuery } from '@/features/todos/api'
 import { CreateTodoDialog } from '@/features/todos/components/create-todo-dialog'
 import type { Todo, TodoStatus } from '@/features/todos/types'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { EllipsisIcon, PlusIcon } from 'lucide-react'
 
@@ -27,6 +27,17 @@ function RouteComponent() {
 }
 
 function Lane(props: { title: string, status: TodoStatus, todos: Todo[] }) {
+  const deleteTodoMutation = useMutation({
+    mutationFn: deleteTodo,
+    onSuccess: () => {
+      invalidateListTodosQuery()
+    }
+  })
+
+  const handleDeleteTodo = (params: { id: number }) => {
+    deleteTodoMutation.mutate(params)
+  }
+
   return (
     <div className="w-96 border bg-gray-50 rounded">
       <div className="p-4 uppercase text-xs">{props.title}</div>
@@ -43,10 +54,14 @@ function Lane(props: { title: string, status: TodoStatus, todos: Todo[] }) {
                     <div className="w-10">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon-sm" className="hover:bg-neutral-200 rounded invisible group-hover:visible transition-none"><EllipsisIcon /></Button>
+                          <Button variant="ghost" size="icon-sm" className="hover:bg-neutral-200 rounded invisible group-hover:visible transition-none">
+                            <EllipsisIcon />
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-40">
-                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            handleDeleteTodo({ id: x.id })
+                          }}>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
