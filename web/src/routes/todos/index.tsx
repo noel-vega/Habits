@@ -129,7 +129,10 @@ function Lane(props: LaneProps) {
     >
 
       <div ref={setNodeRef} className={cn("w-72 border bg-gray-50 rounded")}>
-        <div className="p-4 uppercase text-xs">{props.title}</div>
+        <div className="p-4 uppercase text-xs flex gap-2 justify-between">
+          {props.title}
+          <p className="bg-neutral-200 py-1 px-2 rounded shrink-0 border">{props.todos.length}</p>
+        </div>
         {props.showDropZone && (
           <div className={cn("h-40 border border-blue-500 flex items-center justify-center bg-blue-500/10", {
             "bg-blue-500/20": isOver
