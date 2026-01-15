@@ -36,7 +36,11 @@ function RouteComponent() {
   const [activeTodo, setActiveTodo] = useState<Todo | null>(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before activating
+      }
+    }),
   );
 
   function handleDragEnd(event: DragEndEvent) {
