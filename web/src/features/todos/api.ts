@@ -2,6 +2,12 @@ import { queryOptions } from "@tanstack/react-query"
 import { TodoSchema, type CreateTodo } from "./types"
 import { queryClient } from "@/lib/react-query"
 
+export async function getTodoById(id: number) {
+  const res = await fetch(`/api/todos/${id}`)
+  const json = await res.json()
+  return TodoSchema.parse(json)
+}
+
 export async function listTodos() {
   const res = await fetch("/api/todos")
   const json = await res.json()

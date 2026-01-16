@@ -14,6 +14,7 @@ type Props = {
   todo: Todo
   className?: string
   isDragging?: boolean
+  onClick?: () => void
 }
 
 export function TodoCard(props: Props) {
@@ -35,6 +36,7 @@ export function TodoCard(props: Props) {
   return (
     <Card
       ref={setNodeRef} style={style} {...attributes} {...listeners}
+      onClick={props.onClick}
       className={cn("rounded hover:cursor-pointer hover:bg-neutral-100 hover:border shadow-none p-4 group", props.className)}>
       <CardHeader className="p-0">
         <CardTitle className="flex w-full font-normal">

@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDialog } from '@/hooks'
+import { TodoInfoDialog } from '@/features/todos/components/todo-info-dialog'
 
 export const Route = createFileRoute('/todos/')({
   loader: async ({ context: { queryClient } }) => {
@@ -34,12 +35,9 @@ function RouteComponent() {
   const loaderData = Route.useLoaderData()
   const { data } = useQuery({ ...getListTodosQueryOptions(), initialData: loaderData.todos })
   const [todos, setTodos] = useState(data ?? [])
-
-  useEffect(() => {
-    setTodos(data ?? [])
-  }, [data])
-
   const [activeTodo, setActiveTodo] = useState<Todo | null>(null)
+  const [openTodo, setOpenTodo] = useState<Todo | null>(null)
+  const todoDialog = useDialog()
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -104,30 +102,45 @@ function RouteComponent() {
     setActiveTodo(findTodoById(active.id as number))
   }
 
+  function handleTodoClick(todo: Todo) {
+    setOpenTodo(todo)
+    todoDialog.onOpenChange(true)
+  }
+
+  useEffect(() => {
+    setTodos(data ?? [])
+  }, [data])
+
+
+
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragEnd={handleDragEnd}
-      onDragStart={handleDragStart}
-    >
-      <div className="p-8 h-full w-full">
-        <div className="flex gap-4">
-          <Lane title="Todo" status={"todo"} todos={todos.filter(x => x.status === "todo")} showDropZone={activeTodo && activeTodo.status !== "todo" ? true : false} />
-          <Lane title="In Progress" status={"in-progress"} todos={todos.filter(x => x.status === "in-progress")} showDropZone={activeTodo && activeTodo.status !== "in-progress" ? true : false} />
-          <Lane title="Done" status={"done"} todos={todos.filter(x => x.status === "done")} showDropZone={activeTodo && activeTodo.status !== "done" ? true : false} />
+    <>
+      <DndContext
+        sensors={sensors}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
+      >
+        <div className="p-8 h-full w-full">
+          <div className="flex gap-4">
+            <Lane onTodoClick={handleTodoClick} title="Todo" status={"todo"} todos={todos.filter(x => x.status === "todo")} showDropZone={activeTodo && activeTodo.status !== "todo" ? true : false} />
+            <Lane onTodoClick={handleTodoClick} title="In Progress" status={"in-progress"} todos={todos.filter(x => x.status === "in-progress")} showDropZone={activeTodo && activeTodo.status !== "in-progress" ? true : false} />
+            <Lane onTodoClick={handleTodoClick} title="Done" status={"done"} todos={todos.filter(x => x.status === "done")} showDropZone={activeTodo && activeTodo.status !== "done" ? true : false} />
+          </div>
         </div>
-      </div>
-      <DragOverlay>
-        {activeTodo && (
-          <TodoCard todo={activeTodo} className="shadow-lg hover:cursor-grabbing" isDragging={true} />
-        )}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay>
+          {activeTodo && (
+            <TodoCard todo={activeTodo} className="shadow-lg hover:cursor-grabbing" isDragging={true} />
+          )}
+        </DragOverlay>
+      </DndContext>
+
+      <TodoInfoDialog todo={openTodo} onClose={() => setOpenTodo(null)} />
+    </>
   )
 }
 
-type LaneProps = { title: string, status: TodoStatus, todos: Todo[], showDropZone?: boolean }
+type LaneProps = { title: string, status: TodoStatus, todos: Todo[], showDropZone?: boolean, onTodoClick: (todo: Todo) => void }
 
 function Lane(props: LaneProps) {
   const createTodoDialog = useDialog()
@@ -158,7 +171,7 @@ function Lane(props: LaneProps) {
               <ul className="space-y-1">
                 {props.todos.map(todo => (
                   <li key={todo.id}>
-                    <TodoCard todo={todo} />
+                    <TodoCard todo={todo} onClick={() => props.onTodoClick(todo)} />
                   </li>
                 ))}
               </ul>
@@ -176,3 +189,5 @@ function Lane(props: LaneProps) {
     </SortableContext>
   )
 }
+
+

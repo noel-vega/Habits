@@ -84,6 +84,21 @@ func main() {
 		}
 	})
 
+	r.GET("/todos/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		todo, err := repo.Todos.GetByID(id)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, todo)
+	})
+
 	r.GET("/habits", func(c *gin.Context) {
 		// Return JSON response
 		habitsWithContributions := []HabitWithContributions{}
