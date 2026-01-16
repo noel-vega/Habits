@@ -70,6 +70,24 @@ func main() {
 		}
 	})
 
+	r.PATCH("/todos/:id/position", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		params := UpdatePositionParams{
+			ID: id,
+		}
+		c.Bind(&params)
+
+		err = repo.Todos.UpdatePosition(params)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	})
+
 	r.DELETE("/todos/:id", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
