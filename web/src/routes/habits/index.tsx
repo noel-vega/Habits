@@ -5,28 +5,38 @@ import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { getListHabitsQueryOptions } from '@/features/habits/api'
+import { useDialog } from '@/hooks'
 
 export const Route = createFileRoute('/habits/')({
   loader: async ({ context: { queryClient } }) => {
-    return await queryClient.ensureQueryData(getListHabitsQueryOptions())
+    const habits = await queryClient.ensureQueryData(getListHabitsQueryOptions())
+    return { habits }
   },
-  component: RouteComponent,
+  component: Page,
 })
 
-function RouteComponent() {
-  const initialHabits = Route.useLoaderData()
-  const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: initialHabits })
+function Page() {
+  const loaderData = Route.useLoaderData()
+  const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: loaderData.habits })
   return (
     <div className="p-8 max-w-6xl w-full">
-      <header className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Habits</h1>
-        <CreateHabitDialog>
-          <Button>
-            <PlusIcon /><span>Add Habit</span>
-          </Button>
-        </CreateHabitDialog>
-      </header>
+      <Header />
       <HabitCardList habits={habits.data} />
     </div >
+  )
+}
+
+function Header() {
+  const habitDialog = useDialog()
+  return (
+    <>
+      <header className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Habits</h1>
+        <Button>
+          <PlusIcon /><span>Add Habit</span>
+        </Button>
+      </header>
+      <CreateHabitDialog {...habitDialog} />
+    </>
   )
 }

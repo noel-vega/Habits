@@ -20,10 +20,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import type { DialogProps } from "@/types";
 
 // TODO: the contributions map should not be the day of year
 function HabitContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
-  const { isOpen, setIsOpen } = useDialog()
+  const contributionsDialog = useDialog()
   const { habit, contributions } = props
   const todaysContribution = contributions.get(getDayOfYear(new Date()))
 
@@ -41,7 +42,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
     e.preventDefault()
     e.stopPropagation()
     if (habit.completionType === "custom") {
-      setIsOpen(true)
+      contributionsDialog.onOpenChange(true)
       return
     }
     if (!todaysContribution) {
@@ -80,7 +81,12 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
           )}
           <CircularProgress progress={progress} size={50} strokeWidth={5} showPercentage={false} />
         </button>
-        <CustomContributionCompletionsDialog date={new Date()} habit={props.habit} contribution={todaysContribution} open={isOpen} onOpenChange={setIsOpen} />
+        <CustomContributionCompletionsDialog
+          date={new Date()}
+          habit={props.habit}
+          {...contributionsDialog}
+          contribution={todaysContribution}
+        />
       </>
     )
   }
@@ -92,7 +98,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
   </Button>)
 }
 
-export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; open: boolean; onOpenChange: (open: boolean) => void }) {
+export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; } & DialogProps) {
   const [completions, setCompletions] = useState(props.contribution?.completions ?? 0)
   const [incrementBy, setIncremetBy] = useState(1)
 

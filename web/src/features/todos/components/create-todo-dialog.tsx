@@ -18,7 +18,7 @@ type Props = {
 } & PropsWithChildren
 
 export function CreateTodoDialog({ status = "todo", ...props }: Props) {
-  const { isOpen, setIsOpen, close } = useDialog()
+  const dialog = useDialog()
   const createTodoMutation = useMutation({
     mutationFn: createTodo,
     onSuccess: async () => {
@@ -44,7 +44,7 @@ export function CreateTodoDialog({ status = "todo", ...props }: Props) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog {...dialog}>
       <DialogTrigger asChild>
         {props.children}
       </DialogTrigger>
