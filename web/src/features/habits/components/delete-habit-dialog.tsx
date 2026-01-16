@@ -1,0 +1,38 @@
+import { useNavigate } from "@tanstack/react-router"
+import type { PropsWithChildren } from "react"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Spinner } from "@/components/ui/spinner"
+import { buttonVariants } from "@/components/ui/button"
+import { useDeleteHabit } from "@/features/habits/api"
+import type { DialogProps } from "@/types"
+
+type Props = {
+  id: number
+} & PropsWithChildren & DialogProps
+
+export function DeleteHabitDialog(props: Props) {
+  const navigate = useNavigate()
+  const deleteHabit = useDeleteHabit()
+
+  const handleDelete = () => {
+    deleteHabit.mutate({ id: props.id }, {
+      onSuccess: () => navigate({ to: "/habits" })
+    })
+  }
+  return (
+    <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Habit</AlertDialogTitle>
+          <AlertDialogDescription>Permenantley delete this habit</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>
+            {deleteHabit.isPending ? <Spinner /> : "Delete"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}

@@ -60,20 +60,30 @@ export async function updateHabit(params: Habit) {
   })
 }
 
-export async function deleteHabit(id: number) {
-  await fetch(`/api/habits/${id}`, {
+export async function deleteHabit(params: { id: number }) {
+  await fetch(`/api/habits/${params.id}`, {
     method: "DELETE"
+  })
+  // TODO: return id from api
+  return params
+}
+
+function removeHabitFromQueryCache(params: { id: number }) {
+  queryClient.setQueryData(getListHabitsQueryOptions().queryKey, (oldData) => {
+    return !oldData ? oldData : oldData.filter(x => x.id !== params.id)
   })
 }
 
 export function useDeleteHabit() {
   return useMutation({
     mutationFn: deleteHabit,
-    onMutate: (habitId) => {
-      queryClient.setQueryData(getListHabitsQueryOptions().queryKey, (oldData) => {
-        return !oldData ? oldData : oldData.filter(x => x.id !== habitId)
-      })
+    onMutate: (vars) => {
+      removeHabitFromQueryCache(vars)
     },
+    onSuccess: async (data) => {
+      removeHabitFromQueryCache(data)
+      await invalidateListHabits()
+    }
 
   })
 }

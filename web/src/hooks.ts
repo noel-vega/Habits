@@ -5,7 +5,7 @@ export function useDialog() {
 
   const close = () => onOpenChange(false)
   return {
-    open, onOpenChange, close
+    open, onOpenChange, close, handleOpenDialog: () => onOpenChange(true)
   }
 }
 

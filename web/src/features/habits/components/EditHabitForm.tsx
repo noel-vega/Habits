@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useDialog } from "@/hooks"
 import { CompletionsPerDayInput } from "@/components/ui/completions-per-day-input"
+import type { DialogProps } from "@/types"
 
 type EditHabitFormProps =
   {
@@ -142,11 +142,13 @@ export function EditHabitForm(props: EditHabitFormProps) {
 }
 
 
+type EditHabitDialogProps = {
+  habit: Habit
+} & PropsWithChildren & DialogProps
 
-export function EditHabitDialog(props: { habit: Habit } & PropsWithChildren) {
-  const dialog = useDialog()
+export function EditHabitDialog(props: EditHabitDialogProps) {
   return (
-    <Dialog {...dialog}>
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogTrigger asChild>
         {props.children}
       </DialogTrigger>

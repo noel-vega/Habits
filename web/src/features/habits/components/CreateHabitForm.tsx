@@ -157,11 +157,14 @@ export function CreateHabitForm(props: CreateHabitFormProps) {
 
 
 export function CreateHabitDialog(props: DialogProps) {
+  const closeDialog = () => {
+    props.onOpenChange(false)
+  }
   return (
     <Dialog {...props}>
       <DialogContent>
         <DialogTitle>Create Habit</DialogTitle>
-        <CreateHabitForm onSubmit={close} onCancel={close} />
+        <CreateHabitForm onSubmit={closeDialog} onCancel={closeDialog} />
       </DialogContent>
     </Dialog>
   )
