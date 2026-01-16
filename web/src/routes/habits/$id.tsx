@@ -14,7 +14,7 @@ import { useState } from 'react'
 import { CustomContributionCompletionsDialog } from '@/features/habits/components/HabitCard'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
-import type { Contribution, Habit, HabitWithContributions } from '@/features/habits/types'
+import type { Contribution, HabitWithContributions } from '@/features/habits/types'
 import { DeleteHabitDialog } from '@/features/habits/components/delete-habit-dialog'
 import { useDialog } from '@/hooks'
 

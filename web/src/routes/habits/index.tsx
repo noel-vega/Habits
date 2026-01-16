@@ -30,7 +30,7 @@ function Header() {
   const createHabitDialog = useDialog()
   return (
     <>
-      <header className="flex justify-between items-center">
+      <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold">Habits</h1>
         <Button onClick={createHabitDialog.handleOpenDialog}>
           <PlusIcon /><span>Add Habit</span>

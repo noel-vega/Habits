@@ -6,24 +6,22 @@ import { Field, FieldLabel, FieldDescription, FieldError, FieldSet } from "@/com
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { DialogTrigger } from "@radix-ui/react-dialog"
 import { Button } from "@/components/ui/button"
 import { useMutation } from "@tanstack/react-query"
 import { createTodo, invalidateListTodosQuery } from "@/features/todos/api"
 import { Spinner } from "@/components/ui/spinner"
-import { useDialog } from "@/hooks"
+import type { DialogProps } from "@/types"
 
 type Props = {
   status?: TodoStatus
-} & PropsWithChildren
+} & PropsWithChildren & DialogProps
 
 export function CreateTodoDialog({ status = "todo", ...props }: Props) {
-  const dialog = useDialog()
   const createTodoMutation = useMutation({
     mutationFn: createTodo,
     onSuccess: async () => {
       await invalidateListTodosQuery()
-      close()
+      props.onOpenChange(false)
       form.reset()
 
     }
@@ -44,10 +42,7 @@ export function CreateTodoDialog({ status = "todo", ...props }: Props) {
   }
 
   return (
-    <Dialog {...dialog}>
-      <DialogTrigger asChild>
-        {props.children}
-      </DialogTrigger>
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Todo</DialogTitle>

@@ -20,6 +20,7 @@ import {
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { useDialog } from '@/hooks'
 
 export const Route = createFileRoute('/todos/')({
   loader: async ({ context: { queryClient } }) => {
@@ -129,14 +130,15 @@ function RouteComponent() {
 type LaneProps = { title: string, status: TodoStatus, todos: Todo[], showDropZone?: boolean }
 
 function Lane(props: LaneProps) {
+  const createTodoDialog = useDialog()
   const { setNodeRef, isOver } = useDroppable({ id: props.status, data: props });
+  const handleCreateBtnClick = () => createTodoDialog.onOpenChange(true)
 
   return (
     <SortableContext
       items={props.todos.map(t => t.id)}
       strategy={verticalListSortingStrategy}
     >
-
       <div ref={setNodeRef} className={cn("w-72 border bg-gray-50 rounded")}>
         <div className="p-4 uppercase text-xs flex gap-2 justify-between">
           {props.title}
@@ -161,14 +163,16 @@ function Lane(props: LaneProps) {
                 ))}
               </ul>
               <div>
-                <CreateTodoDialog status={props.status}>
-                  <Button variant="ghost" className="w-full justify-start hover:bg-neutral-200" ><PlusIcon /> <span>Create</span></Button>
-                </CreateTodoDialog>
+                <Button variant="ghost" className="w-full justify-start hover:bg-neutral-200" onClick={handleCreateBtnClick}>
+                  <PlusIcon />
+                  <span>Create</span>
+                </Button>
               </div>
             </div>
           </>
         )}
       </div>
+      <CreateTodoDialog status={props.status} {...createTodoDialog} />
     </SortableContext>
   )
 }

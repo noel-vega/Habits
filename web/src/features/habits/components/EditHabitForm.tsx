@@ -7,7 +7,7 @@ import { Controller, useForm } from "react-hook-form"
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldSet, FieldTitle } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { CompletionsPerDayInput } from "@/components/ui/completions-per-day-input"
 import type { DialogProps } from "@/types"
@@ -147,11 +147,9 @@ type EditHabitDialogProps = {
 } & PropsWithChildren & DialogProps
 
 export function EditHabitDialog(props: EditHabitDialogProps) {
+  const closeDialog = () => props.onOpenChange(false)
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogTrigger asChild>
-        {props.children}
-      </DialogTrigger>
       <DialogContent onOpenAutoFocus={e => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Edit Habit</DialogTitle>
@@ -159,7 +157,7 @@ export function EditHabitDialog(props: EditHabitDialogProps) {
             View and edit your habit settings.
           </DialogDescription>
         </DialogHeader>
-        <EditHabitForm habit={props.habit} onSubmit={close} onCancel={close} />
+        <EditHabitForm habit={props.habit} onSubmit={closeDialog} onCancel={closeDialog} />
       </DialogContent>
     </Dialog>
   )
