@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button'
-import { getListTodosQueryOptions } from '@/features/todos/api'
+import { getListTodosQueryOptions, invalidateListTodosQuery, moveTodo } from '@/features/todos/api'
 import { CreateTodoDialog } from '@/features/todos/components/create-todo-dialog'
 import { TodoCard } from '@/features/todos/components/todo-card'
 import type { Todo, TodoStatus } from '@/features/todos/types'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { PlusIcon } from 'lucide-react'
 import {
@@ -17,9 +17,9 @@ import {
   useDroppable,
 } from '@dnd-kit/core';
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDialog } from '@/hooks'
 import { TodoInfoDialog } from '@/features/todos/components/todo-info-dialog'
 
@@ -34,10 +34,17 @@ export const Route = createFileRoute('/todos/')({
 function RouteComponent() {
   const loaderData = Route.useLoaderData()
   const { data } = useQuery({ ...getListTodosQueryOptions(), initialData: loaderData.todos })
-  const [todos, setTodos] = useState(data ?? [])
+  const todos = data ?? []
   const [activeTodo, setActiveTodo] = useState<Todo | null>(null)
   const [openTodo, setOpenTodo] = useState<Todo | null>(null)
   const todoDialog = useDialog()
+
+  const moveMutation = useMutation({
+    mutationFn: moveTodo,
+    onSuccess: () => {
+      invalidateListTodosQuery()
+    }
+  })
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -54,44 +61,58 @@ function RouteComponent() {
       return
     };
 
-    const todo = findTodoById(active.id as number)
-    if (!todo) {
+    const activeTodo = findTodoById(active.id as number)
+    if (!activeTodo) {
       throw new Error("Could not find todo")
     }
-    const sourceLaneId = todo.status;
+    const sourceLane = activeTodo.status;
     const overTodo = findTodoById(over.id as number);
     const targetLaneId: TodoStatus = overTodo
       ? overTodo.status           // Dropped over a card - use that card's lane
       : over.id as TodoStatus;
 
-
-    if (!sourceLaneId || !targetLaneId) {
+    if (!sourceLane || !targetLaneId) {
       return
     };
 
+    const targetLaneTodos =
+      todos.filter(x => x.status === targetLaneId)
 
-    setTodos(prev => {
-      if (sourceLaneId === targetLaneId) {
-        if (!overTodo) throw new Error("now over todo present")
-        // reorder card in same lane
-        const laneItems = prev.filter(t => t.status === sourceLaneId);
-        const otherItems = prev.filter(t => t.status !== sourceLaneId);
+    if (sourceLane !== targetLaneId) {
+      moveMutation.mutate({
+        id: activeTodo.id,
+        status: targetLaneId,
+        afterPosition: "",
+        beforePosition: targetLaneTodos.length === 0 ? "" : targetLaneTodos[targetLaneTodos.length - 1].position
+      })
+      return
+    }
 
-        const oldIndex = laneItems.findIndex(t => t.id === todo.id);
-        const newIndex = laneItems.findIndex(t => t.id === overTodo.id);
+    const lane = todos.filter(x => x.status === targetLaneId)
+    const fromIdx = active.data.current?.sortable.index
+    const toIdx = over.data.current?.sortable.index
 
-        const reordered = arrayMove(laneItems, oldIndex, newIndex);
-        return [...otherItems, ...reordered];
-      } else {
-        const todos = prev.filter(x => {
-          if (x.id !== todo.id) {
-            return x
-          }
-        })
-        todos.push({ ...todo, status: targetLaneId })
-        return todos
-      }
-    })
+    const UP = -1
+    const DOWN = 1
+    const direction = fromIdx < toIdx ? DOWN : UP
+
+    if (direction === DOWN) {
+      console.log("DOWN")
+      moveMutation.mutate({
+        id: activeTodo.id,
+        status: targetLaneId,
+        afterPosition: lane[toIdx].position,
+        beforePosition: lane[toIdx + DOWN]?.position ?? ""
+      })
+    } else {
+      console.log("UP")
+      moveMutation.mutate({
+        id: activeTodo.id,
+        status: targetLaneId,
+        afterPosition: lane[toIdx + UP]?.position ?? "",
+        beforePosition: lane[toIdx].position
+      })
+    }
   }
 
   function findTodoById(id: number) {
@@ -106,13 +127,6 @@ function RouteComponent() {
     setOpenTodo(todo)
     todoDialog.onOpenChange(true)
   }
-
-  useEffect(() => {
-    setTodos(data ?? [])
-  }, [data])
-
-
-
 
   return (
     <>
@@ -130,7 +144,7 @@ function RouteComponent() {
         </div>
         <DragOverlay>
           {activeTodo && (
-            <TodoCard todo={activeTodo} className="shadow-lg hover:cursor-grabbing" isDragging={true} />
+            <TodoCard index={0} todo={activeTodo} className="shadow-lg hover:cursor-grabbing" isDragging={true} />
           )}
         </DragOverlay>
       </DndContext>
@@ -169,9 +183,9 @@ function Lane(props: LaneProps) {
           <>
             <div className="px-1.5 pb-1.5 space-y-1">
               <ul className="space-y-1">
-                {props.todos.map(todo => (
+                {props.todos.map((todo, index) => (
                   <li key={todo.id}>
-                    <TodoCard todo={todo} onClick={() => props.onTodoClick(todo)} />
+                    <TodoCard index={index} todo={todo} onClick={() => props.onTodoClick(todo)} />
                   </li>
                 ))}
               </ul>

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils"
 
 type Props = {
   todo: Todo
+  index: number
   className?: string
   isDragging?: boolean
   onClick?: () => void
@@ -25,7 +26,7 @@ export function TodoCard(props: Props) {
     setNodeRef,
     transform,
     isDragging
-  } = useSortable({ id: props.todo.id });
+  } = useSortable({ id: props.todo.id, data: { ...props.todo, index: props.index } });
 
   const style = {
     transform: CSS.Transform.toString(transform),

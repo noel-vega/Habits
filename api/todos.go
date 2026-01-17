@@ -64,7 +64,7 @@ func (r *TodosRepo) GetByID(id int) (*Todo, error) {
 
 func (r *TodosRepo) List() (*[]Todo, error) {
 	query := `
-		SELECT * FROM todos
+		SELECT * FROM todos ORDER BY position ASC
 	`
 	todos := &[]Todo{}
 	err := r.DB.Select(todos, query)
