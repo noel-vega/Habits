@@ -138,7 +138,7 @@ type UpdatePositionParams struct {
 	ID             int    `json:"id"`
 	Status         string `json:"status"`
 	AfterPosition  string `json:"afterPosition"`
-	BeforePosition string `json:"BeforePosition"`
+	BeforePosition string `json:"beforePosition"`
 }
 
 func (r *TodosRepo) UpdatePosition(params UpdatePositionParams) error {
