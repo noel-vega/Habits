@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { EllipsisIcon } from "lucide-react"
 import type { Todo } from "@/features/todos/types"
@@ -26,7 +26,7 @@ export function TodoCard(props: Props) {
     setNodeRef,
     transform,
     isDragging
-  } = useSortable({ id: props.todo.id, data: { ...props.todo, index: props.index } });
+  } = useSortable({ id: props.todo.id, data: { type: "todo", todo: props.todo } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -54,6 +54,10 @@ export function TodoCard(props: Props) {
             </TodoCardOptionsDropdown>
           </div>
         </CardTitle>
+        <CardContent>
+          <p>ID:{props.todo.id} </p>
+          <p>Position: {props.todo.position}</p>
+        </CardContent>
       </CardHeader>
     </Card>
   )

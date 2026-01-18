@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS todos (
     name VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'todo',
     description TEXT,
-    position TEXT NOT NULL,
+    position TEXT COLLATE "C" NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_task_status CHECK (status IN ('todo', 'in-progress', 'done'))

@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
-import { getListTodosQueryOptions, invalidateListTodosQuery, moveTodo } from '@/features/todos/api'
+import { getBoard, getBoardQueryOptions, getListTodosQueryOptions, invalidateGetBoardQuery, invalidateListTodosQuery, moveTodo } from '@/features/todos/api'
 import { CreateTodoDialog } from '@/features/todos/components/create-todo-dialog'
 import { TodoCard } from '@/features/todos/components/todo-card'
-import type { Todo, TodoStatus } from '@/features/todos/types'
+import { TodoSchema, TodoStatusSchema, type Todo, type TodoStatus } from '@/features/todos/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { PlusIcon } from 'lucide-react'
@@ -19,22 +19,23 @@ import {
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDialog } from '@/hooks'
 import { TodoInfoDialog } from '@/features/todos/components/todo-info-dialog'
+import z from 'zod/v3'
 
 export const Route = createFileRoute('/todos/')({
   loader: async ({ context: { queryClient } }) => {
     const todos = await queryClient.ensureQueryData(getListTodosQueryOptions())
-    return { todos }
+    const board = await queryClient.ensureQueryData(getBoardQueryOptions())
+    return { todos, board }
   },
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const loaderData = Route.useLoaderData()
-  const { data } = useQuery({ ...getListTodosQueryOptions(), initialData: loaderData.todos })
-  const todos = data ?? []
+  const { data: board } = useQuery({ ...getBoardQueryOptions(), initialData: loaderData.board })
   const [activeTodo, setActiveTodo] = useState<Todo | null>(null)
   const [openTodo, setOpenTodo] = useState<Todo | null>(null)
   const todoDialog = useDialog()
@@ -42,7 +43,7 @@ function RouteComponent() {
   const moveMutation = useMutation({
     mutationFn: moveTodo,
     onSuccess: () => {
-      invalidateListTodosQuery()
+      invalidateGetBoardQuery()
     }
   })
 
@@ -54,73 +55,84 @@ function RouteComponent() {
     }),
   );
 
+  const SortableSchema = z.object({
+    containerId: TodoStatusSchema,
+    index: z.number(),
+    items: z.number().array()
+  })
+
+  const SortableTodoSchema = z.object({
+    type: z.literal("todo"),
+    sortable: SortableSchema,
+    todo: TodoSchema,
+  })
+
+  const DroppableLane = z.object({
+    type: z.literal("lane"),
+    status: TodoStatusSchema
+  })
+
+  const OverSchema = z.discriminatedUnion("type", [SortableTodoSchema, DroppableLane])
+
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
     setActiveTodo(null)
-    if (!over) {
+    if (!event.over) {
+      console.log("no over")
       return
     };
 
-    const activeTodo = findTodoById(active.id as number)
-    if (!activeTodo) {
-      throw new Error("Could not find todo")
-    }
-    const sourceLane = activeTodo.status;
-    const overTodo = findTodoById(over.id as number);
-    const targetLaneId: TodoStatus = overTodo
-      ? overTodo.status           // Dropped over a card - use that card's lane
-      : over.id as TodoStatus;
+    const active = SortableTodoSchema.parse(event.active.data.current)
+    const over = OverSchema.parse(event.over.data.current)
 
-    if (!sourceLane || !targetLaneId) {
-      return
-    };
+    if (over.type === "todo") {
+      const activeIndex = active.sortable.index
+      const overIndex = over.sortable.index
+      const todos = board[over.todo.status]!
 
-    const targetLaneTodos =
-      todos.filter(x => x.status === targetLaneId)
-
-    if (sourceLane !== targetLaneId) {
-      moveMutation.mutate({
-        id: activeTodo.id,
-        status: targetLaneId,
-        afterPosition: "",
-        beforePosition: targetLaneTodos.length === 0 ? "" : targetLaneTodos[targetLaneTodos.length - 1].position
-      })
-      return
-    }
-
-    const lane = todos.filter(x => x.status === targetLaneId)
-    const fromIdx = active.data.current?.sortable.index
-    const toIdx = over.data.current?.sortable.index
-
-    const UP = -1
-    const DOWN = 1
-    const direction = fromIdx < toIdx ? DOWN : UP
-
-    if (direction === DOWN) {
-      console.log("DOWN")
-      moveMutation.mutate({
-        id: activeTodo.id,
-        status: targetLaneId,
-        afterPosition: lane[toIdx].position,
-        beforePosition: lane[toIdx + DOWN]?.position ?? ""
-      })
+      if (overIndex === 0) {
+        moveMutation.mutate({
+          id: active.todo.id,
+          status: over.todo.status,
+          afterPosition: "",
+          beforePosition: over.todo.position
+        })
+      } else {
+        if (activeIndex < overIndex) {
+          moveMutation.mutate({
+            id: active.todo.id,
+            status: over.todo.status,
+            afterPosition: over.todo.position,
+            beforePosition: todos[overIndex + 1]?.position ?? "",
+          })
+        } else {
+          moveMutation.mutate({
+            id: active.todo.id,
+            status: over.todo.status,
+            afterPosition: todos[overIndex - 1]?.position ?? "",
+            beforePosition: over.todo.position,
+          })
+        }
+      }
     } else {
-      console.log("UP")
+      const todos = board[over.status]
       moveMutation.mutate({
-        id: activeTodo.id,
-        status: targetLaneId,
-        afterPosition: lane[toIdx + UP]?.position ?? "",
-        beforePosition: lane[toIdx].position
+        id: active.todo.id,
+        status: over.status,
+        afterPosition: !todos ? "" : todos[todos.length - 1].position,
+        beforePosition: "",
       })
+
     }
   }
 
-  function findTodoById(id: number) {
-    return todos.find(x => x.id === id) ?? null
+  function findTodoById(status: TodoStatus, id: number) {
+    return board[status]?.find(x => x.id === id) ?? null
   }
 
   function handleDragStart({ active }: DragStartEvent) {
-    setActiveTodo(findTodoById(active.id as number))
+    const todo = active.data.current?.todo as Todo
+    if (!todo) return
+    setActiveTodo(todo)
   }
 
   function handleTodoClick(todo: Todo) {
@@ -137,9 +149,9 @@ function RouteComponent() {
       >
         <div className="p-8 h-full w-full">
           <div className="flex gap-4">
-            <Lane onTodoClick={handleTodoClick} title="Todo" status={"todo"} todos={todos.filter(x => x.status === "todo")} showDropZone={activeTodo && activeTodo.status !== "todo" ? true : false} />
-            <Lane onTodoClick={handleTodoClick} title="In Progress" status={"in-progress"} todos={todos.filter(x => x.status === "in-progress")} showDropZone={activeTodo && activeTodo.status !== "in-progress" ? true : false} />
-            <Lane onTodoClick={handleTodoClick} title="Done" status={"done"} todos={todos.filter(x => x.status === "done")} showDropZone={activeTodo && activeTodo.status !== "done" ? true : false} />
+            <Lane onTodoClick={handleTodoClick} title="Todo" status={"todo"} todos={board["todo"] ?? []} showDropZone={activeTodo && activeTodo.status !== "todo" ? true : false} />
+            <Lane onTodoClick={handleTodoClick} title="In Progress" status={"in-progress"} todos={board["in-progress"] ?? []} showDropZone={activeTodo && activeTodo.status !== "in-progress" ? true : false} />
+            <Lane onTodoClick={handleTodoClick} title="Done" status={"done"} todos={board["done"] ?? []} showDropZone={activeTodo && activeTodo.status !== "done" ? true : false} />
           </div>
         </div>
         <DragOverlay>
@@ -158,11 +170,12 @@ type LaneProps = { title: string, status: TodoStatus, todos: Todo[], showDropZon
 
 function Lane(props: LaneProps) {
   const createTodoDialog = useDialog()
-  const { setNodeRef, isOver } = useDroppable({ id: props.status, data: props });
+  const { setNodeRef, isOver } = useDroppable({ id: props.status, data: { type: "lane", status: props.status } });
   const handleCreateBtnClick = () => createTodoDialog.onOpenChange(true)
 
   return (
     <SortableContext
+      id={props.status}
       items={props.todos.map(t => t.id)}
       strategy={verticalListSortingStrategy}
     >

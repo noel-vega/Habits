@@ -55,6 +55,26 @@ func main() {
 		c.JSON(http.StatusOK, todos)
 	})
 
+	r.GET("/todos/board", func(c *gin.Context) {
+		todos, err := repo.Todos.List()
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		board := map[string][]Todo{}
+
+		for _, todo := range todos {
+			todos, exists := board[todo.Status]
+			if !exists {
+				board[todo.Status] = []Todo{todo}
+			} else {
+				board[todo.Status] = append(todos, todo)
+			}
+		}
+		c.JSON(http.StatusOK, board)
+	})
+
 	r.POST("/todos", func(c *gin.Context) {
 		var todo CreateTodoParams
 		err := c.Bind(&todo)

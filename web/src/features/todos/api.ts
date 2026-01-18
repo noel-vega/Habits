@@ -1,6 +1,27 @@
 import { queryOptions } from "@tanstack/react-query"
-import { TodoSchema, type CreateTodo, type TodoStatus } from "./types"
+import { TodoSchema, TodoStatusSchema, type CreateTodo, type TodoStatus } from "./types"
 import { queryClient } from "@/lib/react-query"
+import z from "zod/v3"
+
+
+const BoardSchema = z.record(TodoStatusSchema, TodoSchema.array())
+
+export async function getBoard() {
+  const response = await fetch("/api/todos/board")
+  const json = await response.json()
+  return BoardSchema.parse(json)
+}
+
+export function getBoardQueryOptions() {
+  return queryOptions({
+    queryKey: ['board'],
+    queryFn: getBoard
+  })
+}
+
+export function invalidateGetBoardQuery() {
+  return queryClient.invalidateQueries(getBoardQueryOptions())
+}
 
 export async function getTodoById(id: number) {
   const res = await fetch(`/api/todos/${id}`)
@@ -49,6 +70,7 @@ type MoveTodoParams = {
 }
 export async function moveTodo(params: MoveTodoParams) {
   const { id, ...rest } = params
+  console.log("MOVE TODO:", params)
   await fetch(`/api/todos/${id}/position`, {
     method: "PATCH",
     body: JSON.stringify(rest),
