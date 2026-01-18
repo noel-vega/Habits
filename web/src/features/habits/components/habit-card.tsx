@@ -6,7 +6,7 @@ import { createContribution, invalidateHabitById, invalidateListHabits, updateCo
 import { CalendarIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { format, getDayOfYear } from "date-fns";
 import { Link } from "@tanstack/react-router";
-import { ContributionsGrid } from "./ContributionsGrid";
+import { ContributionsGrid } from "./contributions-grid";
 import { Tooltip } from "react-tooltip";
 import { useDialog } from "@/hooks";
 import { useDebouncedCallback } from 'use-debounce';
@@ -90,11 +90,11 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
       </>
     )
   }
-  return (<Button variant="outline" onClick={handleContribution}
+  return (<Button onClick={handleContribution} size="lg" variant="outline"
     className={cn({
       "bg-primary text-white hover:bg-primary hover:text-white": todaysContribution?.completions === habit.completionsPerDay
     })}>
-    <CheckIcon />
+    <CheckIcon className="size-5 stroke-3" />
   </Button>)
 }
 

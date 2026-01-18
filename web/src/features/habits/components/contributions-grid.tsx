@@ -34,7 +34,7 @@ export function ContributionsGrid(props: { habit: Habit; contributions: Map<numb
                 "bg-[#c6e48b] border-[#c6e48b]": progress > 0,
                 "bg-[#7bc96f] border-[#7bc96f]": progress > 25,
                 "bg-[#239a3b] border-[#239a3b]": progress > 75,
-                "bg-[#196127] border-[#196127]": progress === 100,
+                "bg-green-600 border-bg-green-600": progress === 100,
               }
             )} key={cell.day}></li>
         })}

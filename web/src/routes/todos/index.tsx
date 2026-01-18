@@ -213,7 +213,6 @@ function RouteComponent() {
         beforePosition: "",
         targetIndex: todos?.length ?? 0
       })
-
     }
   }
 

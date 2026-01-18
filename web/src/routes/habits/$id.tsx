@@ -1,7 +1,7 @@
 import { createContribution, getHabitByIdQueryOptions, invalidateHabitById, invalidateListHabits, updateContributionCompletions } from '@/features/habits/api'
 import { BackButton } from '@/components/BackButton'
-import { ContributionsGrid } from '@/features/habits/components/ContributionsGrid'
-import { EditHabitDialog } from '@/features/habits/components/EditHabitForm'
+import { ContributionsGrid } from '@/features/habits/components/contributions-grid'
+import { EditHabitDialog } from '@/features/habits/components/edit-habit-form'
 import { Button } from '@/components/ui/button'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouteContext } from '@tanstack/react-router'
@@ -11,7 +11,7 @@ import z from 'zod/v3'
 
 import { Calendar } from '@/components/ui/calendar'
 import { useState } from 'react'
-import { CustomContributionCompletionsDialog } from '@/features/habits/components/HabitCard'
+import { CustomContributionCompletionsDialog } from '@/features/habits/components/habit-card'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import type { Contribution, HabitWithContributions } from '@/features/habits/types'
@@ -73,8 +73,8 @@ function Header({ habit }: { habit: HabitWithContributions }) {
           <Button className="ml-auto" onClick={handleOpenEditDialog}>
             <EditIcon /> <span>Edit</span>
           </Button>
-          <Button variant="secondary" size="icon" onClick={handleOpenDeleteDialog}>
-            <Trash2Icon />
+          <Button variant="secondary" onClick={handleOpenDeleteDialog}>
+            <Trash2Icon /><span>Delete</span>
           </Button>
         </div>
       </header>
