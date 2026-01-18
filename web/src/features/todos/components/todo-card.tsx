@@ -16,7 +16,6 @@ type Props = {
   isDragging?: boolean
   onClick?: () => void
   activeTodo: Todo | null
-  activeIndex: number
 }
 
 export function TodoCard(props: Props) {
@@ -26,20 +25,20 @@ export function TodoCard(props: Props) {
     listeners,
     setNodeRef: setDraggableRef,
     isDragging
-  } = useDraggable({ 
-    id: `draggable-${props.todo.id}`, 
-    data: { type: "todo", todo: props.todo, index: props.index } 
+  } = useDraggable({
+    id: `draggable-${props.todo.id}`,
+    data: { type: "todo", todo: props.todo, index: props.index }
   });
 
   // Two droppable zones: one for top half (insert before), one for bottom half (insert after)
-  const { setNodeRef: setDroppableTopRef, isOver: isOverTop } = useDroppable({ 
-    id: `droppable-top-${props.todo.id}`, 
-    data: { type: "todo", todo: props.todo, index: props.index, position: "before" } 
+  const { setNodeRef: setDroppableTopRef, isOver: isOverTop } = useDroppable({
+    id: `droppable-top-${props.todo.id}`,
+    data: { type: "todo", todo: props.todo, index: props.index, position: "before" }
   });
 
-  const { setNodeRef: setDroppableBottomRef, isOver: isOverBottom } = useDroppable({ 
-    id: `droppable-bottom-${props.todo.id}`, 
-    data: { type: "todo", todo: props.todo, index: props.index, position: "after" } 
+  const { setNodeRef: setDroppableBottomRef, isOver: isOverBottom } = useDroppable({
+    id: `droppable-bottom-${props.todo.id}`,
+    data: { type: "todo", todo: props.todo, index: props.index, position: "after" }
   });
 
   const style = {
@@ -55,12 +54,12 @@ export function TodoCard(props: Props) {
       {showDropZones && (
         <div ref={setDroppableTopRef} className="absolute top-0 left-0 right-0 h-1/2 z-20" />
       )}
-      
+
       {/* Bottom drop zone - insert AFTER this card - only active during drag */}
       {showDropZones && (
         <div ref={setDroppableBottomRef} className="absolute bottom-0 left-0 right-0 h-1/2 z-20" />
       )}
-      
+
       {/* Drop indicators */}
       {isOverTop && !isDragging && (
         <div className="absolute -top-1 left-0 right-0 h-0.5 bg-blue-500 z-10" />
@@ -68,7 +67,7 @@ export function TodoCard(props: Props) {
       {isOverBottom && !isDragging && (
         <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-500 z-10" />
       )}
-      
+
       <Card
         ref={setDraggableRef} style={style} {...attributes} {...listeners}
         onClick={props.onClick}

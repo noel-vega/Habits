@@ -84,7 +84,7 @@ function RouteComponent() {
 
         // Insert at specific index instead of sorting
         const targetLane = [...(newBoard[params.status] ?? [])]
-        
+
         // Adjust target index if moving within same lane
         let insertIndex = params.targetIndex ?? targetLane.length
         if (todo.status === params.status && todo.id !== undefined) {
@@ -95,13 +95,13 @@ function RouteComponent() {
             insertIndex = Math.max(0, insertIndex - 1)
           }
         }
-        
+
         targetLane.splice(insertIndex, 0, updatedTodo)
         newBoard[params.status] = targetLane
 
         return newBoard
       })
-      
+
       // Return context for rollback
       return { previousBoard }
     },
@@ -148,7 +148,7 @@ function RouteComponent() {
   function handleDragEnd(event: DragEndEvent) {
     // Clear overlay immediately when drop happens
     setActiveTodo(null)
-    
+
     if (!event.over) {
       console.log("no over")
       return
@@ -177,7 +177,7 @@ function RouteComponent() {
         afterPosition = overIndex > 0 ? todos[overIndex - 1].position : ""
         beforePosition = over.todo.position
         targetIndex = overIndex
-        
+
         // Adjust for same-lane removal
         if (isSameLane && activeIndex < overIndex) {
           targetIndex = overIndex - 1
@@ -187,7 +187,7 @@ function RouteComponent() {
         afterPosition = over.todo.position
         beforePosition = todos[overIndex + 1]?.position ?? ""
         targetIndex = overIndex + 1
-        
+
         // Adjust for same-lane removal
         if (isSameLane && activeIndex < overIndex) {
           targetIndex = overIndex
@@ -244,7 +244,7 @@ function RouteComponent() {
         </div>
         {activeTodo && (
           <DragOverlay>
-            <TodoCard index={0} todo={activeTodo} className="shadow-lg hover:cursor-grabbing" />
+            <TodoCard activeTodo={activeTodo} index={0} todo={activeTodo} className="shadow-lg hover:cursor-grabbing" />
           </DragOverlay>
         )}
       </DndContext>
@@ -258,7 +258,7 @@ type LaneProps = { title: string, status: TodoStatus, todos: Todo[], showDropZon
 
 function Lane(props: LaneProps) {
   const createTodoDialog = useDialog()
-  const { setNodeRef, isOver } = useDroppable({ id: props.status, data: { type: "lane", status: props.status } });
+  const { setNodeRef } = useDroppable({ id: props.status, data: { type: "lane", status: props.status } });
   const handleCreateBtnClick = () => createTodoDialog.onOpenChange(true)
 
   return (
@@ -268,44 +268,31 @@ function Lane(props: LaneProps) {
           {props.title}
           <p className="bg-neutral-200 py-1 px-2 rounded shrink-0 border">{props.todos.length}</p>
         </div>
-        {props.showDropZone && (
-          <div className={cn("h-40 border border-blue-500 flex items-center justify-center bg-blue-500/10", {
-            "bg-blue-500/20": isOver
-          })}>
-            <p className="border border-blue-500 p-2 rounded text-xs font-bold">{props.title}</p>
-          </div>
-        )}
 
-        {!props.showDropZone && (
-          <>
-            <div className="px-1.5 pb-1.5 space-y-1">
-              <ul className="space-y-1">
-                {props.todos.map((todo, index) => {
-                  const activeIndex = props.activeTodo && props.activeTodo.status === props.status 
-                    ? props.todos.findIndex(t => t.id === props.activeTodo?.id)
-                    : -1;
-                  return (
-                    <li key={todo.id}>
-                      <TodoCard 
-                        activeTodo={props.activeTodo} 
-                        activeIndex={activeIndex}
-                        index={index} 
-                        todo={todo} 
-                        onClick={() => props.onTodoClick(todo)} 
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-              <div>
-                <Button variant="ghost" className="w-full justify-start hover:bg-neutral-200" onClick={handleCreateBtnClick}>
-                  <PlusIcon />
-                  <span>Create</span>
-                </Button>
-              </div>
+        <>
+          <div className="px-1.5 pb-1.5 space-y-1">
+            <ul className="space-y-1">
+              {props.todos.map((todo, index) => {
+                return (
+                  <li key={todo.id}>
+                    <TodoCard
+                      activeTodo={props.activeTodo}
+                      index={index}
+                      todo={todo}
+                      onClick={() => props.onTodoClick(todo)}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+            <div>
+              <Button variant="ghost" className="w-full justify-start hover:bg-neutral-200" onClick={handleCreateBtnClick}>
+                <PlusIcon />
+                <span>Create</span>
+              </Button>
             </div>
-          </>
-        )}
+          </div>
+        </>
       </div>
       <CreateTodoDialog status={props.status} {...createTodoDialog} />
     </>
