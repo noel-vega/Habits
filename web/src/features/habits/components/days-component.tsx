@@ -18,7 +18,7 @@ export function Days(props: { habits: HabitWithContributions[] }) {
             <div className={cn("p-4 rounded-lg hover:bg-secondary flex flex-col items-center gap-3", {
               "bg-secondary": getDayOfYear(day) === getDayOfYear(new Date())
             })}>
-              <p>{format(day, 'EEEEE')}</p>
+              <p>{format(day, 'EEE')}</p>
               <div className={cn("size-10 rounded-full bg-white border-2 flex items-center justify-center", {
                 "bg-green-600 text-white border-green-600": isDone
               })}>
