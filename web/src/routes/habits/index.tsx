@@ -9,6 +9,7 @@ import { useDialog } from '@/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { format } from 'date-fns'
 import { TodaysProgress } from '@/features/habits/components/today-progress'
+import { Days } from '@/features/habits/components/days-component'
 
 export const Route = createFileRoute('/habits/')({
   loader: async ({ context: { queryClient } }) => {
@@ -22,9 +23,12 @@ function Page() {
   const loaderData = Route.useLoaderData()
   const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: loaderData.habits })
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full">
+    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
       <Header />
-      <div className="py-8">
+      <div>
+        <Days habits={habits.data} />
+      </div>
+      <div className="">
         <TodaysProgress habits={habits.data} />
       </div>
 
@@ -62,9 +66,11 @@ function Header() {
   return (
     <>
       <header className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Habits</h1>
-          {format(new Date(), 'EEEE, MMMM d')}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Habits</h1>
+          <p className="text-lg">
+            {format(new Date(), 'EEEE, MMMM d')}
+          </p>
         </div>
         <Button onClick={createHabitDialog.handleOpenDialog}>
           <PlusIcon /><span>Add Habit</span>
