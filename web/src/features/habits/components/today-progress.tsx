@@ -1,9 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { CircularProgress } from "@/components/ui/circle-progress";
-import { CheckIcon, GoalIcon } from "lucide-react";
 import type { HabitWithContributions } from "../types";
-import { format, getDayOfYear } from "date-fns";
-import { cn, getCompletedHabits, getWeekDays } from "@/lib/utils";
+import { getDayOfYear } from "date-fns";
 
 export function TodaysProgress(props: { habits: HabitWithContributions[] }) {
   const today = new Date()
@@ -14,41 +12,16 @@ export function TodaysProgress(props: { habits: HabitWithContributions[] }) {
 
   const progress = completedHabits / props.habits.length * 100
   return (
-    <Card>
-      <CardContent>
-        <div className="flex justify-between items-center">
-          <div className="flex gap-6">
-            <div className="">
-              <p>Today's Progress</p>
-              <p className="font-semibold text-lg">{completedHabits} of {props.habits.length} habits completed</p>
-            </div>
+    <Card className="bg-blue-100/50 border-blue-200">
+      <CardContent className="flex justify-between items-center" >
+        <div className="flex gap-6">
+          <div className="">
+            <p>Today's Progress</p>
+            <p className="font-semibold text-lg">{completedHabits} of {props.habits.length} habits completed</p>
           </div>
-
-          <CircularProgress progress={progress} size={65} strokeWidth={5} showPercentage />
         </div>
 
-        {/* <ul className="flex gap-1"> */}
-        {/*   {weekDays.map(day => { */}
-        {/*     const { isDone } = getCompletedHabits({ day, habits: props.habits }) */}
-        {/**/}
-        {/*     return ( */}
-        {/*       <li key={day.getDay()} className="flex-1"> */}
-        {/*         <div className={cn("p-4 rounded-lg hover:bg-secondary flex flex-col items-center gap-1.5", { */}
-        {/*           "bg-secondary": getDayOfYear(day) === getDayOfYear(new Date()) */}
-        {/*         })}> */}
-        {/*           <p className="text-sm">{format(day, 'EEEEE')}</p> */}
-        {/*           <div className={cn("size-10 rounded-full bg-white border-2 flex items-center justify-center", { */}
-        {/*             "bg-green-600 text-white border-green-600": isDone */}
-        {/*           })}> */}
-        {/*             {isDone && ( */}
-        {/*               <CheckIcon /> */}
-        {/*             )} */}
-        {/*           </div> */}
-        {/*         </div> */}
-        {/*       </li> */}
-        {/*     ) */}
-        {/*   })} */}
-        {/* </ul> */}
+        <CircularProgress progress={progress} size={65} strokeWidth={5} showPercentage />
       </CardContent>
     </Card>
   )

@@ -24,6 +24,7 @@ import { useDialog } from '@/hooks'
 import { TodoInfoDialog } from '@/features/todos/components/todo-info-dialog'
 import z from 'zod/v3'
 import { generateKeyBetween } from 'fractional-indexing'
+import { Page } from '@/components/Page'
 
 export const Route = createFileRoute('/todos/')({
   loader: async ({ context: { queryClient } }) => {
@@ -228,18 +229,16 @@ function RouteComponent() {
   }
 
   return (
-    <>
+    <Page title="Todos" className="space-y-4">
       <DndContext
         sensors={sensors}
         onDragEnd={handleDragEnd}
         onDragStart={handleDragStart}
       >
-        <div className="p-8 h-full w-full">
-          <div className="flex gap-4">
-            <Lane activeTodo={activeTodo} onTodoClick={handleTodoClick} title="Todo" status={"todo"} todos={board["todo"] ?? []} showDropZone={activeTodo && activeTodo.status !== "todo" ? true : false} />
-            <Lane activeTodo={activeTodo} onTodoClick={handleTodoClick} title="In Progress" status={"in-progress"} todos={board["in-progress"] ?? []} showDropZone={activeTodo && activeTodo.status !== "in-progress" ? true : false} />
-            <Lane activeTodo={activeTodo} onTodoClick={handleTodoClick} title="Done" status={"done"} todos={board["done"] ?? []} showDropZone={activeTodo && activeTodo.status !== "done" ? true : false} />
-          </div>
+        <div className="flex gap-4">
+          <Lane activeTodo={activeTodo} onTodoClick={handleTodoClick} title="Todo" status={"todo"} todos={board["todo"] ?? []} showDropZone={activeTodo && activeTodo.status !== "todo" ? true : false} />
+          <Lane activeTodo={activeTodo} onTodoClick={handleTodoClick} title="In Progress" status={"in-progress"} todos={board["in-progress"] ?? []} showDropZone={activeTodo && activeTodo.status !== "in-progress" ? true : false} />
+          <Lane activeTodo={activeTodo} onTodoClick={handleTodoClick} title="Done" status={"done"} todos={board["done"] ?? []} showDropZone={activeTodo && activeTodo.status !== "done" ? true : false} />
         </div>
         {activeTodo && (
           <DragOverlay>
@@ -249,7 +248,7 @@ function RouteComponent() {
       </DndContext>
 
       <TodoInfoDialog todo={openTodo} onClose={() => setOpenTodo(null)} />
-    </>
+    </Page>
   )
 }
 
