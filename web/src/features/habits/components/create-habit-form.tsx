@@ -12,6 +12,8 @@ import { CompletionsPerDayInput } from "@/components/ui/completions-per-day-inpu
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import type { DialogProps } from "@/types"
+import { Label } from "@/components/ui/label"
+import { ActivityIcon, DumbbellIcon, MonitorIcon } from "lucide-react"
 
 type CreateHabitFormProps =
   {
@@ -56,22 +58,31 @@ export function CreateHabitForm(props: CreateHabitFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Controller control={form.control} name="name"
-        render={({ field, fieldState }) => {
-          return (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-              <Input
-                {...field}
-                id={field.name}
-                aria-invalid={fieldState.invalid}
-                autoComplete="off"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )
-        }}
-      />
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-center items-end">
+          <div className="size-20 border-3 rounded-full flex items-center justify-center bg-secondary">
+            <ActivityIcon size={32} className="text-muted-foreground" />
+          </div>
+          <div className="bg-blue-500 size-4 rounded border border-blue-500" />
+        </div>
+        <Controller control={form.control} name="name"
+          render={({ field, fieldState }) => {
+            return (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  autoComplete="off"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )
+          }}
+        />
+
+      </div>
 
       <Controller control={form.control} name="description"
         render={({ field, fieldState }) => {

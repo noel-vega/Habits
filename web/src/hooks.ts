@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-export function useDialog() {
-  const [open, onOpenChange] = useState(false)
+export function useDialog(isOpen: boolean = false) {
+  const [open, onOpenChange] = useState(isOpen)
 
   const close = () => onOpenChange(false)
   return {

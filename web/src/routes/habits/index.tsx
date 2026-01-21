@@ -47,7 +47,7 @@ function RouteComponent() {
 
 
 function Header() {
-  const createHabitDialog = useDialog()
+  const createHabitDialog = useDialog(true)
   return (
     <>
       <header className="flex items-center gap-4 pb-2">
