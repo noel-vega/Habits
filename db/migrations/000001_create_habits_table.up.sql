@@ -2,9 +2,10 @@ CREATE TABLE IF NOT EXISTS habits (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
+    icon TEXT NOT NULL DEFAULT 'activity',
     completion_type VARCHAR(20) NOT NULL DEFAULT 'step',
     completions_per_day int NOT NULL DEFAULT 1,
-    unit_of_measurement VARCHAR(20) NOT NULL DEFAULT 'times'
+    unit_of_measurement VARCHAR(20) NOT NULL DEFAULT 'times',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_completion_type CHECK (completion_type IN ('step', 'custom')),
