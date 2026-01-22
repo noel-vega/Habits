@@ -217,8 +217,9 @@ func main() {
 
 		c.JSON(http.StatusOK, HabitWithContributions{
 			ID:                habit.ID,
-			Description:       habit.Description,
 			Name:              habit.Name,
+			Icon:              habit.Icon,
+			Description:       habit.Description,
 			CompletionType:    habit.CompletionType,
 			CompletionsPerDay: habit.CompletionsPerDay,
 			Contributions:     []Contribution{},
