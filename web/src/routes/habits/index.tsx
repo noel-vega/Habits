@@ -29,17 +29,26 @@ function RouteComponent() {
         <div>
           <WeekdayIndicator habits={habits.data} />
         </div>
-        <div className="">
-          <TodaysProgress habits={habits.data} />
-        </div>
 
-        <ul className="space-y-4">
-          {habits.data.map(habit => <li key={habit.id}>
-            <Link key={habit.id} to="/habits/$id" params={{ id: habit.id }}>
-              <HabitCard habit={habit} />
-            </Link>
-          </li>)}
-        </ul>
+        {habits.data.length === 0 ? (
+          <div className="bg-secondary border rounded p-8">
+            <p>Add your first habit to get started!</p>
+          </div>
+        ) : (
+          <>
+            <div className="">
+              <TodaysProgress habits={habits.data} />
+            </div>
+
+            <ul className="space-y-4">
+              {habits.data.map(habit => <li key={habit.id}>
+                <Link key={habit.id} to="/habits/$id" params={{ id: habit.id }}>
+                  <HabitCard habit={habit} />
+                </Link>
+              </li>)}
+            </ul>
+          </>
+        )}
       </div>
     </Page>
   )
