@@ -1,19 +1,18 @@
-import { cn, getCompletedHabits, getWeekDays } from "@/lib/utils"
+import { cn, getCompletedHabits, getDaysAround, getWeekDays } from "@/lib/utils"
 import { format, getDayOfYear } from "date-fns"
 import { CheckIcon, TriangleIcon } from "lucide-react"
 import type { HabitWithContributions } from "../types"
 
 
-export function WeekdayIndicator(props: { habits: HabitWithContributions[] }) {
-
-  const weekDays = getWeekDays()
+export function WeekdayIndicator(props: { habits: HabitWithContributions[], day: Date, around: number }) {
+  const days = getDaysAround(props.day, props.around)
   return (
 
     <ul className="flex gap-3 relative">
-      {weekDays.map(day => {
+      {days.map((day, i) => {
         const { isDone } = getCompletedHabits({ day, habits: props.habits })
         return (
-          <li key={day.getDay()} className="flex-1">
+          <li key={i} className="flex-1">
             <div className={cn("p-4 rounded-lg hover:bg-secondary/30 flex flex-col items-center gap-3 border", {
               "bg-secondary hover:bg-secondary": getDayOfYear(day) === getDayOfYear(new Date())
             })}>

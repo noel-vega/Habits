@@ -24,9 +24,20 @@ function RouteComponent() {
   const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: loaderData.habits })
   return (
     <Page title="Habits">
-      <div className="max-w-5xl space-y-6">
+      <div className="max-w-5xl space-y-6 @container">
         <Header />
-        <WeekdayIndicator habits={habits.data} />
+
+        <div className="@xl:hidden">
+          <WeekdayIndicator habits={habits.data} day={new Date()} around={1} />
+        </div>
+        <div className="hidden @xl:block @4xl:hidden">
+          <WeekdayIndicator habits={habits.data} day={new Date()} around={2} />
+        </div>
+        <div className="hidden @4xl:block">
+          <WeekdayIndicator habits={habits.data} day={new Date()} around={3} />
+        </div>
+
+
 
         {habits.data.length === 0 ? (
           <div className="bg-secondary border rounded p-8">
