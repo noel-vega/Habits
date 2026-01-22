@@ -76,7 +76,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
         ) : (
           <CheckIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 stroke-green-600" />
         )}
-        <CircularProgress progress={progress} size={50} strokeWidth={5} showPercentage={false} />
+        <CircularProgress progress={progress} size={60} strokeWidth={5} showPercentage={false} />
       </button>
       <CustomContributionCompletionsDialog
         date={new Date()}
@@ -198,25 +198,25 @@ export function HabitCard(props: { habit: HabitWithContributions }) {
   return (
     <Card className="">
       <CardHeader className="flex">
-        <div className="flex-1 space-y-2">
-          <CardTitle className="font-normal">
-            <div className="flex gap-4">
-              <DynamicIcon className="size-10" name={habit.icon} />
-              <div>
-                <p className="font-bold text-lg">{habit.name}</p>
-                <div className="flex gap-2 items-center text-sm">
-                  <p>3 / 7 this week</p>
-                  <DotIcon />
-                  <div className="flex items-center gap-1.5">
-                    <FlameIcon size={16} />
-                    <p>3 day streak</p>
-                  </div>
+        <CardTitle className="font-normal flex-1">
+          <div className="flex gap-4">
+            <div className="size-14 border-2 rounded-lg grid place-content-center">
+              <DynamicIcon className="size-8" name={habit.icon} />
+            </div>
+            <div>
+              <p className="font-bold text-lg">{habit.name}</p>
+              <CardDescription>{habit.description}</CardDescription>
+              <div className="flex gap-2 items-center text-sm">
+                <p>3 / 7 this week</p>
+                <DotIcon />
+                <div className="flex items-center gap-1.5">
+                  <FlameIcon size={16} />
+                  <p>3 day streak</p>
                 </div>
               </div>
             </div>
-          </CardTitle>
-          <CardDescription>{habit.description}</CardDescription>
-        </div>
+          </div>
+        </CardTitle>
         <HabitContributionButton habit={habit} contributions={contributions} />
       </CardHeader>
     </Card>
