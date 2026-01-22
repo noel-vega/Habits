@@ -9,7 +9,7 @@ type PageProps = {
 export function Page(props: PageProps) {
   useHeaderStore.setState({ title: props.title })
   return (
-    <div className={cn("p-4 lg:p-8 w-full h-full", props.className)}>
+    <div className={cn("p-3.5 lg:p-8 w-full h-full", props.className)}>
       {props.children}
     </div>
 

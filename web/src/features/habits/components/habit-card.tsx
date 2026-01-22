@@ -8,7 +8,7 @@ import { Tooltip } from "react-tooltip";
 import { useDialog } from "@/hooks";
 import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup } from "@/components/ui/button-group";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CircularProgress } from "@/components/ui/circle-progress";
 import { FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -196,29 +196,31 @@ export function HabitCard(props: { habit: HabitWithContributions }) {
   const { habit } = props
   const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
   return (
-    <Card className="">
+    <Card>
       <CardHeader className="flex">
         <CardTitle className="font-normal flex-1">
           <div className="flex gap-4">
-            <div className="size-14 border-2 rounded-lg grid place-content-center">
+            <div className="size-14 border-2 rounded-lg grid place-content-center shrink-0">
               <DynamicIcon className="size-8" name={habit.icon} />
             </div>
             <div>
               <p className="font-bold text-lg">{habit.name}</p>
               <CardDescription>{habit.description}</CardDescription>
-              <div className="flex gap-2 items-center text-sm">
-                <p>3 / 7 this week</p>
-                <DotIcon />
-                <div className="flex items-center gap-1.5">
-                  <FlameIcon size={16} />
-                  <p>3 day streak</p>
-                </div>
-              </div>
             </div>
           </div>
         </CardTitle>
         <HabitContributionButton habit={habit} contributions={contributions} />
       </CardHeader>
+      <CardFooter>
+        <div className="flex gap-2 items-center text-sm">
+          <p>3 / 7 this week</p>
+          <DotIcon />
+          <div className="flex items-center gap-1.5">
+            <FlameIcon size={16} />
+            <p>3 day streak</p>
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   )
 }
