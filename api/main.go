@@ -31,12 +31,17 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	Init()
 
 	repo := NewPostgresRepository(db)
 
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
 	r.Use(cors.Default())
+
+	r.GET("/auth/google/login", HandleLogin)
+	r.GET("/auth/google/callback", HandleCallback)
+	r.GET("/emails", HandleListEmails)
 
 	// Define a simple GET endpoint
 	r.GET("/ping", func(c *gin.Context) {
