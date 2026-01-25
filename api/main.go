@@ -42,109 +42,6 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	r.GET("/auth/google/login", HandleLogin)
-	r.GET("/auth/google/callback", HandleCallback)
-	r.GET("/emails", HandleListEmails)
-
-	// Define a simple GET endpoint
-	r.GET("/ping", func(c *gin.Context) {
-		// Return JSON response
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	r.GET("/todos", func(c *gin.Context) {
-		todos, err := repo.Todos.List()
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, todos)
-	})
-
-	r.GET("/todos/board", func(c *gin.Context) {
-		todos, err := repo.Todos.List()
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		board := map[string][]Todo{}
-
-		for _, todo := range todos {
-			todos, exists := board[todo.Status]
-			if !exists {
-				board[todo.Status] = []Todo{todo}
-			} else {
-				board[todo.Status] = append(todos, todo)
-			}
-		}
-		c.JSON(http.StatusOK, board)
-	})
-
-	r.POST("/todos", func(c *gin.Context) {
-		var todo CreateTodoParams
-		err := c.Bind(&todo)
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		err = repo.Todos.Create(todo)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	})
-
-	r.PATCH("/todos/:id/position", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		params := UpdatePositionParams{
-			ID: id,
-		}
-		c.Bind(&params)
-
-		err = repo.Todos.UpdatePosition(params)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	})
-
-	r.DELETE("/todos/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		err = repo.Todos.Delete(id)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	})
-
-	r.GET("/todos/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		todo, err := repo.Todos.GetByID(id)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, todo)
-	})
-
 	r.GET("/habits", func(c *gin.Context) {
 		// Return JSON response
 		habitsWithContributions := []habit.HabitWithContributions{}
@@ -276,4 +173,107 @@ func main() {
 	if err := r.Run(); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
+
+	r.GET("/auth/google/login", HandleLogin)
+	r.GET("/auth/google/callback", HandleCallback)
+	r.GET("/emails", HandleListEmails)
+
+	// Define a simple GET endpoint
+	r.GET("/ping", func(c *gin.Context) {
+		// Return JSON response
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	r.GET("/todos", func(c *gin.Context) {
+		todos, err := repo.Todos.List()
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.JSON(http.StatusOK, todos)
+	})
+
+	r.GET("/todos/board", func(c *gin.Context) {
+		todos, err := repo.Todos.List()
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		board := map[string][]Todo{}
+
+		for _, todo := range todos {
+			todos, exists := board[todo.Status]
+			if !exists {
+				board[todo.Status] = []Todo{todo}
+			} else {
+				board[todo.Status] = append(todos, todo)
+			}
+		}
+		c.JSON(http.StatusOK, board)
+	})
+
+	r.POST("/todos", func(c *gin.Context) {
+		var todo CreateTodoParams
+		err := c.Bind(&todo)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		err = repo.Todos.Create(todo)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	})
+
+	r.PATCH("/todos/:id/position", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		params := UpdatePositionParams{
+			ID: id,
+		}
+		c.Bind(&params)
+
+		err = repo.Todos.UpdatePosition(params)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	})
+
+	r.DELETE("/todos/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		err = repo.Todos.Delete(id)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	})
+
+	r.GET("/todos/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		todo, err := repo.Todos.GetByID(id)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, todo)
+	})
 }
