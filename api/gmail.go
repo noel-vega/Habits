@@ -22,6 +22,9 @@ var (
 
 func Init() {
 	oauthConfig = &oauth2.Config{
+		ClientID:     "",
+		ClientSecret: "",
+		RedirectURL:  "http://localhost:8080/auth/google/callback",
 		Scopes: []string{
 			gmail.GmailReadonlyScope,
 			gmail.GmailSendScope,
