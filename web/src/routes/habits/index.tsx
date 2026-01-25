@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { HabitCard } from '@/features/habits/components/habit-card'
-import { CreateHabitDialog, CreateHabitDialogDrawer, CreateHabitDrawer } from '@/features/habits/components/create-habit-form'
+import { CreateHabitDialogDrawer } from '@/features/habits/components/create-habit-form'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
@@ -13,7 +13,6 @@ import { Page } from '@/components/page'
 
 export const Route = createFileRoute('/habits/')({
   loader: async ({ context: { queryClient } }) => {
-    console.log("load habits route")
     const habits = await queryClient.ensureQueryData(getListHabitsQueryOptions())
     return { habits }
   },
@@ -24,7 +23,6 @@ function RouteComponent() {
   const loaderData = Route.useLoaderData()
   const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: loaderData.habits })
 
-  console.log(habits.error)
   const createHabitDialog = useDialog()
   return (
     <Page title="Habits">
