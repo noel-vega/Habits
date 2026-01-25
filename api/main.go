@@ -10,18 +10,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/noel-vega/habits/api/internal/habit"
 )
 
 type PostgresRepository struct {
-	Habits        *HabitsRepo
-	Contributions *ContributionsRepo
+	Habits        *habit.Repo
+	Contributions *habit.ContributionsRepo
 	Todos         *TodosRepo
 }
 
 func NewPostgresRepository(db *sqlx.DB) *PostgresRepository {
 	return &PostgresRepository{
-		Habits:        NewHabitsRepository(db),
-		Contributions: NewContributionsRepo(db),
+		Habits:        habit.NewRepo(db),
+		Contributions: habit.NewContributionsRepo(db),
 		Todos:         newTodosRepo(db),
 	}
 }
@@ -144,21 +145,21 @@ func main() {
 
 	r.GET("/habits", func(c *gin.Context) {
 		// Return JSON response
-		habitsWithContributions := []HabitWithContributions{}
+		habitsWithContributions := []habit.HabitWithContributions{}
 		habits := repo.Habits.List()
-		for _, habit := range habits {
-			contributions, err := repo.Contributions.List(habit.ID)
+		for _, h := range habits {
+			contributions, err := repo.Contributions.List(h.ID)
 			if err != nil {
 				c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
-			habitsWithContributions = append(habitsWithContributions, HabitWithContributions{
-				ID:                habit.ID,
-				Name:              habit.Name,
-				Icon:              habit.Icon,
-				Description:       habit.Description,
-				CompletionType:    habit.CompletionType,
-				CompletionsPerDay: habit.CompletionsPerDay,
+			habitsWithContributions = append(habitsWithContributions, habit.HabitWithContributions{
+				ID:                h.ID,
+				Name:              h.Name,
+				Icon:              h.Icon,
+				Description:       h.Description,
+				CompletionType:    h.CompletionType,
+				CompletionsPerDay: h.CompletionsPerDay,
 				Contributions:     contributions,
 			})
 		}
@@ -172,24 +173,24 @@ func main() {
 			return
 		}
 
-		habit, err := repo.Habits.GetByID(id)
+		h, err := repo.Habits.GetByID(id)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		contributions, err := repo.Contributions.List(habit.ID)
+		contributions, err := repo.Contributions.List(h.ID)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		habitWithContributions := HabitWithContributions{
-			ID:                habit.ID,
-			Name:              habit.Name,
-			Icon:              habit.Icon,
-			Description:       habit.Description,
-			CompletionType:    habit.CompletionType,
-			CompletionsPerDay: habit.CompletionsPerDay,
+		habitWithContributions := habit.HabitWithContributions{
+			ID:                h.ID,
+			Name:              h.Name,
+			Icon:              h.Icon,
+			Description:       h.Description,
+			CompletionType:    h.CompletionType,
+			CompletionsPerDay: h.CompletionsPerDay,
 			Contributions:     contributions,
 		}
 		c.JSON(http.StatusOK, habitWithContributions)
@@ -202,7 +203,7 @@ func main() {
 			return
 		}
 
-		params := UpdateHabitParams{ID: id}
+		params := habit.UpdateHabitParams{ID: id}
 		c.Bind(&params)
 		err = repo.Habits.Update(params)
 		if err != nil {
@@ -211,23 +212,23 @@ func main() {
 	})
 
 	r.POST("/habits", func(c *gin.Context) {
-		var data CreateHabitParams
+		var data habit.CreateHabitParams
 		c.Bind(&data)
 
-		habit, err := repo.Habits.Create(data)
+		h, err := repo.Habits.Create(data)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, HabitWithContributions{
-			ID:                habit.ID,
-			Name:              habit.Name,
-			Icon:              habit.Icon,
-			Description:       habit.Description,
-			CompletionType:    habit.CompletionType,
-			CompletionsPerDay: habit.CompletionsPerDay,
-			Contributions:     []Contribution{},
+		c.JSON(http.StatusOK, habit.HabitWithContributions{
+			ID:                h.ID,
+			Name:              h.Name,
+			Icon:              h.Icon,
+			Description:       h.Description,
+			CompletionType:    h.CompletionType,
+			CompletionsPerDay: h.CompletionsPerDay,
+			Contributions:     []habit.Contribution{},
 		})
 	})
 
@@ -252,7 +253,7 @@ func main() {
 			return
 		}
 
-		params := CreateContributionParams{
+		params := habit.CreateContributionParams{
 			HabitID: habitID,
 		}
 		c.Bind(&params)
@@ -270,7 +271,7 @@ func main() {
 			return
 		}
 
-		params := UpdateCompletionsParams{
+		params := habit.UpdateCompletionsParams{
 			ID: contributionID,
 		}
 		c.Bind(&params)
