@@ -87,3 +87,24 @@ func (handler *Handler) UpdateHabit(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 	}
 }
+
+func (handler *Handler) CreateHabit(c *gin.Context) {
+	var data CreateHabitParams
+	c.Bind(&data)
+
+	h, err := handler.HabitRepo.Create(data)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, HabitWithContributions{
+		ID:                h.ID,
+		Name:              h.Name,
+		Icon:              h.Icon,
+		Description:       h.Description,
+		CompletionType:    h.CompletionType,
+		CompletionsPerDay: h.CompletionsPerDay,
+		Contributions:     []Contribution{},
+	})
+}

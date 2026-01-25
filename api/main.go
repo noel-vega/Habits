@@ -44,28 +44,8 @@ func main() {
 
 	r.GET("/habits", habitHandler.ListHabits)
 	r.GET("/habits/:id", habitHandler.GetHabitByID)
+	r.POST("/habits", habitHandler.CreateHabit)
 	r.PATCH("/habits/:id", habitHandler.UpdateHabit)
-
-	r.POST("/habits", func(c *gin.Context) {
-		var data habit.CreateHabitParams
-		c.Bind(&data)
-
-		h, err := repo.Habits.Create(data)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, habit.HabitWithContributions{
-			ID:                h.ID,
-			Name:              h.Name,
-			Icon:              h.Icon,
-			Description:       h.Description,
-			CompletionType:    h.CompletionType,
-			CompletionsPerDay: h.CompletionsPerDay,
-			Contributions:     []habit.Contribution{},
-		})
-	})
 
 	r.DELETE("/habits/:habit_id", func(c *gin.Context) {
 		habitID, err := strconv.Atoi(c.Param("habit_id"))
