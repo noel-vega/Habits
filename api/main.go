@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -37,8 +36,6 @@ func main() {
 	habitHandler := habit.NewHandler(db)
 	todosHandler := todos.NewHandler(db)
 
-	repo := NewPostgresRepository(db)
-
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
 	r.Use(cors.Default())
@@ -64,23 +61,9 @@ func main() {
 	r.GET("/todos", todosHandler.ListTodos)
 	r.GET("/todos/board", todosHandler.GetTodosBoard)
 	r.POST("/todos", todosHandler.CreateTodo)
-	r.PATCH("/todos/:id/position", todosHandler.UpdateTodoPosition)
+	r.GET("/todos/:id", todosHandler.GetTodoByID)
 	r.DELETE("/todos/:id", todosHandler.DeleteTodo)
-
-	r.GET("/todos/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		todo, err := repo.Todos.GetByID(id)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, todo)
-	})
+	r.PATCH("/todos/:id/position", todosHandler.UpdateTodoPosition)
 
 	r.GET("/auth/google/login", HandleLogin)
 	r.GET("/auth/google/callback", HandleCallback)

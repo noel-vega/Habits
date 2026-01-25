@@ -93,3 +93,18 @@ func (handler *Handler) DeleteTodo(c *gin.Context) {
 		return
 	}
 }
+
+func (handler *Handler) GetTodoByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	todo, err := handler.TodosRepo.GetByID(id)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, todo)
+}
