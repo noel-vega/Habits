@@ -33,35 +33,27 @@ func main() {
 	}
 	Init()
 
-	todosHandler := todos.NewHandler(db)
-
 	// Create a Gin router with default middleware (logger and recovery)
-	r := gin.Default()
-	r.Use(cors.Default())
+	router := gin.Default()
+	router.Use(cors.Default())
 
 	// Define a simple GET endpoint
-	r.GET("/ping", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		// Return JSON response
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	habit.AttachRoutes(r, db)
+	habit.AttachRoutes(router, db)
+	todos.AttachRoutes(router, db)
 
-	r.GET("/todos", todosHandler.ListTodos)
-	r.GET("/todos/board", todosHandler.GetTodosBoard)
-	r.POST("/todos", todosHandler.CreateTodo)
-	r.GET("/todos/:id", todosHandler.GetTodoByID)
-	r.DELETE("/todos/:id", todosHandler.DeleteTodo)
-	r.PATCH("/todos/:id/position", todosHandler.UpdateTodoPosition)
-
-	r.GET("/auth/google/login", HandleLogin)
-	r.GET("/auth/google/callback", HandleCallback)
-	r.GET("/emails", HandleListEmails)
+	router.GET("/auth/google/login", HandleLogin)
+	router.GET("/auth/google/callback", HandleCallback)
+	router.GET("/emails", HandleListEmails)
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
-	if err := r.Run(); err != nil {
+	if err := router.Run(); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }
