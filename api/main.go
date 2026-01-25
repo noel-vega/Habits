@@ -61,10 +61,6 @@ func main() {
 	r.DELETE("/habits/contributions/:id", habitHandler.DeleteHabitContribution)
 	r.PATCH("/habits/contributions/:id", habitHandler.UpdateHabitContribution)
 
-	r.GET("/auth/google/login", HandleLogin)
-	r.GET("/auth/google/callback", HandleCallback)
-	r.GET("/emails", HandleListEmails)
-
 	r.GET("/todos", todosHandler.ListTodos)
 	r.GET("/todos/board", todosHandler.GetTodosBoard)
 	r.POST("/todos", todosHandler.CreateTodo)
@@ -98,6 +94,10 @@ func main() {
 
 		c.JSON(http.StatusOK, todo)
 	})
+
+	r.GET("/auth/google/login", HandleLogin)
+	r.GET("/auth/google/callback", HandleCallback)
+	r.GET("/emails", HandleListEmails)
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
