@@ -47,20 +47,8 @@ func main() {
 	r.PATCH("/habits/:id", habitHandler.UpdateHabit)
 	r.DELETE("/habits/:id", habitHandler.DeleteHabit)
 	r.POST("/habits/:id/contributions", habitHandler.CreateHabitContribution)
-	r.PATCH("/habits/contributions/:id/completions", habitHandler.UpdateHabitContribution)
-
-	r.DELETE("/contributions/:id", func(c *gin.Context) {
-		contributionID, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		err = repo.Contributions.Delete(contributionID)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	})
+	r.DELETE("/habits/contributions/:id", habitHandler.DeleteHabitContribution)
+	r.PATCH("/habits/contributions/:id", habitHandler.UpdateHabitContribution)
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)

@@ -157,3 +157,16 @@ func (handler *Handler) UpdateHabitContribution(c *gin.Context) {
 		return
 	}
 }
+
+func (handler *Handler) DeleteHabitContribution(c *gin.Context) {
+	contributionID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	err = handler.ContribRepo.Delete(contributionID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+}
