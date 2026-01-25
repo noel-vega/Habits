@@ -5,17 +5,16 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func AttachRoutes(router *gin.Engine, db *sqlx.DB) {
-	r := router.Group("/habits")
+func AttachRoutes(r *gin.Engine, db *sqlx.DB) {
 	h := NewHandler(db)
 
 	// habit routes
-	r.GET("/", h.ListHabits)
-	r.POST("/", h.CreateHabit)
-	r.GET("/:id", h.GetHabitByID)
-	r.PATCH("/:id", h.UpdateHabit)
-	r.DELETE("/:id", h.DeleteHabit)
-	r.POST("/:id/contributions", h.CreateHabitContribution)
-	r.DELETE("/contributions/:id", h.DeleteHabitContribution)
-	r.PATCH("/contributions/:id", h.UpdateHabitContribution)
+	r.GET("/habits", h.ListHabits)
+	r.POST("/habits", h.CreateHabit)
+	r.GET("/habits/:id", h.GetHabitByID)
+	r.PATCH("/habits/:id", h.UpdateHabit)
+	r.DELETE("/habits/:id", h.DeleteHabit)
+	r.POST("/habits/:id/contributions", h.CreateHabitContribution)
+	r.DELETE("/habits/contributions/:id", h.DeleteHabitContribution)
+	r.PATCH("/habits/contributions/:id", h.UpdateHabitContribution)
 }

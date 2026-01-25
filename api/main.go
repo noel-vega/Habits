@@ -44,8 +44,7 @@ func main() {
 			"message": "pong",
 		})
 	})
-	habit.AttachRoutes(router, db)
-	todos.AttachRoutes(router, db)
+	router = habit.AttachRoutes(router, db)
 
 	router.GET("/auth/google/login", HandleLogin)
 	router.GET("/auth/google/callback", HandleCallback)

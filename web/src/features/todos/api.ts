@@ -30,6 +30,7 @@ export async function getTodoById(id: number) {
 }
 
 export async function listTodos() {
+  console.log("list todos")
   const res = await fetch("/api/todos")
   const json = await res.json()
   return TodoSchema.array().parse(json)

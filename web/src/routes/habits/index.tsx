@@ -13,6 +13,7 @@ import { Page } from '@/components/page'
 
 export const Route = createFileRoute('/habits/')({
   loader: async ({ context: { queryClient } }) => {
+    console.log("load habits route")
     const habits = await queryClient.ensureQueryData(getListHabitsQueryOptions())
     return { habits }
   },
@@ -22,6 +23,8 @@ export const Route = createFileRoute('/habits/')({
 function RouteComponent() {
   const loaderData = Route.useLoaderData()
   const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: loaderData.habits })
+
+  console.log(habits.error)
   const createHabitDialog = useDialog()
   return (
     <Page title="Habits">

@@ -5,8 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func AttachRoutes(router *gin.Engine, db *sqlx.DB) {
-	r := router.Group("/habits")
+func AttachRoutes(r *gin.Engine, db *sqlx.DB) {
 	h := NewHandler(db)
 
 	r.GET("/todos", h.ListTodos)

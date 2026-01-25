@@ -21,7 +21,7 @@ export async function invalidateHabitById(id: number) {
 
 export async function listHabits() {
   console.log("list habits")
-  const res = await fetch("/api/habits")
+  const res = await fetch("/api/habits/")
   const data = await res.json()
   return HabitWithContributionsSchema.array().parse(data)
 }
