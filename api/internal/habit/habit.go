@@ -49,11 +49,11 @@ type UpdateHabitParams struct {
 	CompletionsPerDay int    `json:"completionsPerDay" db:"completions_per_day"`
 }
 
-type Repo struct {
+type HabitRepo struct {
 	db *sqlx.DB
 }
 
-func (r *Repo) GetByID(id int) (*Habit, error) {
+func (r *HabitRepo) GetByID(id int) (*Habit, error) {
 	habit := Habit{}
 	err := r.db.Get(&habit, "SELECT * FROM habits WHERE id=$1", id)
 	if err != nil {
@@ -62,13 +62,13 @@ func (r *Repo) GetByID(id int) (*Habit, error) {
 	return &habit, nil
 }
 
-func (r *Repo) List() []Habit {
+func (r *HabitRepo) List() []Habit {
 	habits := []Habit{}
 	r.db.Select(&habits, "SELECT * FROM habits")
 	return habits
 }
 
-func (r *Repo) Create(params CreateHabitParams) (*Habit, error) {
+func (r *HabitRepo) Create(params CreateHabitParams) (*Habit, error) {
 	query := `
         INSERT INTO habits (name, description, completion_type, completions_per_day, icon) 
         VALUES ($1, $2, $3, $4, $5)
@@ -84,7 +84,7 @@ func (r *Repo) Create(params CreateHabitParams) (*Habit, error) {
 	return &habit, nil
 }
 
-func (r *Repo) Update(params UpdateHabitParams) error {
+func (r *HabitRepo) Update(params UpdateHabitParams) error {
 	query := `
 		UPDATE habits 
 	  SET name = :name, description = :description, completion_type = :completion_type, completions_per_day = :completions_per_day
@@ -98,7 +98,7 @@ func (r *Repo) Update(params UpdateHabitParams) error {
 	return nil
 }
 
-func (r *Repo) Delete(ID int) error {
+func (r *HabitRepo) Delete(ID int) error {
 	query := `DELETE FROM habits WHERE id = $1;`
 	_, err := r.db.Exec(query, ID)
 	if err != nil {
@@ -107,8 +107,8 @@ func (r *Repo) Delete(ID int) error {
 	return nil
 }
 
-func NewRepo(db *sqlx.DB) *Repo {
-	return &Repo{
+func NewHabitRepo(db *sqlx.DB) *HabitRepo {
+	return &HabitRepo{
 		db: db,
 	}
 }

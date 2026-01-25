@@ -14,14 +14,14 @@ import (
 )
 
 type PostgresRepository struct {
-	Habits        *habit.Repo
+	Habits        *habit.HabitRepo
 	Contributions *habit.ContributionsRepo
 	Todos         *TodosRepo
 }
 
 func NewPostgresRepository(db *sqlx.DB) *PostgresRepository {
 	return &PostgresRepository{
-		Habits:        habit.NewRepo(db),
+		Habits:        habit.NewHabitRepo(db),
 		Contributions: habit.NewContributionsRepo(db),
 		Todos:         newTodosRepo(db),
 	}
@@ -33,6 +33,8 @@ func main() {
 		log.Fatalln(err)
 	}
 	Init()
+
+	habitHandler := habit.NewHandler(db)
 
 	repo := NewPostgresRepository(db)
 
@@ -166,35 +168,7 @@ func main() {
 		c.JSON(http.StatusOK, habitsWithContributions)
 	})
 
-	r.GET("/habits/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		h, err := repo.Habits.GetByID(id)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		contributions, err := repo.Contributions.List(h.ID)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		habitWithContributions := habit.HabitWithContributions{
-			ID:                h.ID,
-			Name:              h.Name,
-			Icon:              h.Icon,
-			Description:       h.Description,
-			CompletionType:    h.CompletionType,
-			CompletionsPerDay: h.CompletionsPerDay,
-			Contributions:     contributions,
-		}
-		c.JSON(http.StatusOK, habitWithContributions)
-	})
+	r.GET("/habits/:id", habitHandler.GetHabitByID)
 
 	r.PATCH("/habits/:id", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))

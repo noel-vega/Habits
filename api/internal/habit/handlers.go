@@ -1,0 +1,51 @@
+package habit
+
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
+)
+
+type Handler struct {
+	HabitRepo   HabitRepo
+	ContribRepo ContributionsRepo
+}
+
+func NewHandler(db *sqlx.DB) *Handler {
+	return &Handler{
+		HabitRepo:   *NewHabitRepo(db),
+		ContribRepo: *NewContributionsRepo(db),
+	}
+}
+
+func (handler *Handler) GetHabitByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	h, err := handler.HabitRepo.GetByID(id)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	contributions, err := handler.ContribRepo.List(h.ID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	habitWithContributions := HabitWithContributions{
+		ID:                h.ID,
+		Name:              h.Name,
+		Icon:              h.Icon,
+		Description:       h.Description,
+		CompletionType:    h.CompletionType,
+		CompletionsPerDay: h.CompletionsPerDay,
+		Contributions:     contributions,
+	}
+	c.JSON(http.StatusOK, habitWithContributions)
+}
