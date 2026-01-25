@@ -43,6 +43,14 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
+	// Define a simple GET endpoint
+	r.GET("/ping", func(c *gin.Context) {
+		// Return JSON response
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
 	// habit routes
 	r.GET("/habits", habitHandler.ListHabits)
 	r.POST("/habits", habitHandler.CreateHabit)
@@ -56,14 +64,6 @@ func main() {
 	r.GET("/auth/google/login", HandleLogin)
 	r.GET("/auth/google/callback", HandleCallback)
 	r.GET("/emails", HandleListEmails)
-
-	// Define a simple GET endpoint
-	r.GET("/ping", func(c *gin.Context) {
-		// Return JSON response
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 
 	r.GET("/todos", todosHandler.ListTodos)
 	r.GET("/todos/board", todosHandler.GetTodosBoard)
