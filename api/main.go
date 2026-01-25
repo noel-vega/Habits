@@ -35,6 +35,7 @@ func main() {
 	Init()
 
 	habitHandler := habit.NewHandler(db)
+	todosHandler := todos.NewHandler(db)
 
 	repo := NewPostgresRepository(db)
 
@@ -64,14 +65,7 @@ func main() {
 		})
 	})
 
-	r.GET("/todos", func(c *gin.Context) {
-		todos, err := repo.Todos.List()
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, todos)
-	})
+	r.GET("/todos", todosHandler.ListTodos)
 
 	r.GET("/todos/board", func(c *gin.Context) {
 		t, err := repo.Todos.List()
