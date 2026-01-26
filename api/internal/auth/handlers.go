@@ -45,8 +45,8 @@ func (h *Handler) SignUp(c *gin.Context) {
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
-	var data SignInParams
-	c.Bind(data)
+	data := SignInParams{}
+	c.Bind(&data)
 	token, err := h.AuthService.SignIn(data)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
