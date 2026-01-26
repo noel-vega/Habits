@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/noel-vega/habits/api/internal/auth"
 	"github.com/noel-vega/habits/api/internal/habit"
 	"github.com/noel-vega/habits/api/internal/todos"
 	"github.com/noel-vega/habits/api/internal/users"
@@ -24,9 +25,10 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
+	auth.AttachRoutes(router, db)
+	users.AttachRoutes(router, db)
 	habit.AttachRoutes(router, db)
 	todos.AttachRoutes(router, db)
-	users.AttachRoutes(router, db)
 
 	router.GET("/auth/google/login", HandleLogin)
 	router.GET("/auth/google/callback", HandleCallback)
