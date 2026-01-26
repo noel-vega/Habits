@@ -23,6 +23,16 @@ func (r *UserRepo) GetUserByEmail(email string) (*UserNoPassword, error) {
 	return user, nil
 }
 
+func (r *UserRepo) GetUserByEmailWithPassword(email string) (*User, error) {
+	user := &User{}
+	query := `SELECT * FROM users WHERE email = $1`
+	err := r.DB.Get(user, query, email)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 type CreateUserParams struct {
 	FirstName string `json:"firstName" db:"first_name"`
 	LastName  string `json:"lastName" db:"last_name"`
@@ -30,15 +40,18 @@ type CreateUserParams struct {
 	Password  string `json:"password" db:"password"`
 }
 
-func (r *UserRepo) CreateUser(params CreateUserParams) error {
+func (r *UserRepo) CreateUser(params CreateUserParams) (*UserNoPassword, error) {
+	user := &UserNoPassword{}
 	query := `
 	   INSERT INTO users (first_name, last_name, email, password) 
-		 VALUES (:first_name, :last_name, :email, :password) 
+		 VALUES ($1, $2, $3, $4) 
+		 RETURNING id, first_name, last_name, email, created_at, updated_at
 	`
 
-	_, err := r.DB.NamedExec(query, params)
+	err := r.DB.Get(user, query, params.FirstName, params.LastName, params.Email, params.Password)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	return user, nil
 }

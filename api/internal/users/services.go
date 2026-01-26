@@ -18,23 +18,31 @@ func NewUserService(db *sqlx.DB) *UserService {
 	}
 }
 
-func (svc *UserService) CreateUser(params CreateUserParams) error {
+func (svc *UserService) CreateUser(params CreateUserParams) (*UserNoPassword, error) {
 	existingUser, err := svc.UserRepo.GetUserByEmail(params.Email)
 	fmt.Printf("USER: %v+\n", existingUser)
 
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return err
+			return nil, err
 		}
 	}
 
 	if existingUser != nil {
-		return fmt.Errorf("%s:%w", params.Email, ErrEmailExists)
+		return nil, fmt.Errorf("%s:%w", params.Email, ErrEmailExists)
 	}
 
-	err = svc.UserRepo.CreateUser(params)
+	newUser, err := svc.UserRepo.CreateUser(params)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return newUser, nil
+}
+
+func (svc *UserService) GetUserByCredentials(email string, password string) (*User, error) {
+	user, err := svc.UserRepo.GetUserByEmailWithPassword(email)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
