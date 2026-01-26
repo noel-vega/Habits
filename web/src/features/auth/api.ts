@@ -25,3 +25,22 @@ export async function signUp(params: SignUpParams) {
     throw new Error("Failed to signup")
   }
 }
+
+const SignInParamsSchema = z.object({
+  email: z.string(),
+  password: z.string()
+})
+
+type SignInParams = z.infer<typeof SignInParamsSchema>
+export async function signIn(params: SignInParams) {
+  const response = await fetch("/api/auth/signin", {
+    method: "POST",
+    body: JSON.stringify(params),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  if (!response.ok) {
+    throw new Error("Failed to signup")
+  }
+}
