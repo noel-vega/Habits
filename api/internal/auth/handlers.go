@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/noel-vega/habits/api/internal/users"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
@@ -27,6 +28,14 @@ func (h *Handler) SignUp(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	password := string(bytes)
+	data.Password = password
 
 	err = h.UserService.CreateUser(data)
 	if err != nil {
