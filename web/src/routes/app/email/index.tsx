@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import z from 'zod/v3'
 
-export const Route = createFileRoute('/email/')({
+export const Route = createFileRoute('/app/email/')({
   component: RouteComponent,
 })
 

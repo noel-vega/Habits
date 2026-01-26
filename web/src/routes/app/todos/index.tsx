@@ -26,7 +26,7 @@ import z from 'zod/v3'
 import { generateKeyBetween } from 'fractional-indexing'
 import { Page } from '@/components/page'
 
-export const Route = createFileRoute('/todos/')({
+export const Route = createFileRoute('/app/todos/')({
   loader: async ({ context: { queryClient } }) => {
     const todos = await queryClient.ensureQueryData(getListTodosQueryOptions())
     const board = await queryClient.ensureQueryData(getBoardQueryOptions())

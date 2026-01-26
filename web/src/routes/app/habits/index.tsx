@@ -11,7 +11,7 @@ import { TodaysProgress } from '@/features/habits/components/today-progress'
 import { WeekdayIndicator } from '@/features/habits/components/week-day-indicator'
 import { Page } from '@/components/page'
 
-export const Route = createFileRoute('/habits/')({
+export const Route = createFileRoute('/app/habits/')({
   loader: async ({ context: { queryClient } }) => {
     const habits = await queryClient.ensureQueryData(getListHabitsQueryOptions())
     return { habits }
@@ -58,7 +58,7 @@ function RouteComponent() {
             <TodaysProgress habits={habits.data} />
             <ul className="space-y-4">
               {habits.data.map(habit => <li key={habit.id}>
-                <Link key={habit.id} to="/habits/$id" params={{ id: habit.id }}>
+                <Link key={habit.id} to="/app/habits/$id" params={{ id: habit.id }}>
                   <HabitCard habit={habit} />
                 </Link>
               </li>)}

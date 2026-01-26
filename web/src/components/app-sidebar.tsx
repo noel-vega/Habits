@@ -20,28 +20,28 @@ const items = [
   },
   {
     title: "Habits",
-    url: "/habits",
+    url: "/app/habits",
     icon: SproutIcon,
   },
   {
     title: "Todos",
-    url: "/todos",
+    url: "/app/todos",
     icon: ListIcon,
   },
   {
     title: "Finances",
-    url: "/finances",
+    url: "/app/finances",
     icon: BanknoteIcon,
   },
   {
     title: "Email",
-    url: "/email",
+    url: "/app/email",
     icon: MailIcon,
   },
 
   {
     title: "Files",
-    url: "/files",
+    url: "/app/files",
     icon: FilesIcon,
   },
 ]

@@ -16,7 +16,7 @@ export function DeleteHabitDialog(props: Props) {
 
   const handleDelete = () => {
     deleteHabit.mutate({ id: props.id }, {
-      onSuccess: () => navigate({ to: "/habits" })
+      onSuccess: () => navigate({ to: "/app/habits" })
     })
   }
   return (

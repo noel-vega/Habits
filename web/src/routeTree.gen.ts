@@ -9,48 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TodosIndexRouteImport } from './routes/todos/index'
-import { Route as HabitsIndexRouteImport } from './routes/habits/index'
-import { Route as FinancesIndexRouteImport } from './routes/finances/index'
-import { Route as FilesIndexRouteImport } from './routes/files/index'
-import { Route as EmailIndexRouteImport } from './routes/email/index'
-import { Route as HabitsIdRouteImport } from './routes/habits/$id'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AppTodosIndexRouteImport } from './routes/app/todos/index'
+import { Route as AppHabitsIndexRouteImport } from './routes/app/habits/index'
+import { Route as AppFinancesIndexRouteImport } from './routes/app/finances/index'
+import { Route as AppFilesIndexRouteImport } from './routes/app/files/index'
+import { Route as AppEmailIndexRouteImport } from './routes/app/email/index'
+import { Route as AppHabitsIdRouteImport } from './routes/app/habits/$id'
 
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TodosIndexRoute = TodosIndexRouteImport.update({
-  id: '/todos/',
-  path: '/todos/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HabitsIndexRoute = HabitsIndexRouteImport.update({
-  id: '/habits/',
-  path: '/habits/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FinancesIndexRoute = FinancesIndexRouteImport.update({
-  id: '/finances/',
-  path: '/finances/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FilesIndexRoute = FilesIndexRouteImport.update({
-  id: '/files/',
-  path: '/files/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmailIndexRoute = EmailIndexRouteImport.update({
-  id: '/email/',
-  path: '/email/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HabitsIdRoute = HabitsIdRouteImport.update({
-  id: '/habits/$id',
-  path: '/habits/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -58,131 +34,127 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   path: '/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTodosIndexRoute = AppTodosIndexRouteImport.update({
+  id: '/todos/',
+  path: '/todos/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppHabitsIndexRoute = AppHabitsIndexRouteImport.update({
+  id: '/habits/',
+  path: '/habits/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFinancesIndexRoute = AppFinancesIndexRouteImport.update({
+  id: '/finances/',
+  path: '/finances/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFilesIndexRoute = AppFilesIndexRouteImport.update({
+  id: '/files/',
+  path: '/files/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppEmailIndexRoute = AppEmailIndexRouteImport.update({
+  id: '/email/',
+  path: '/email/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppHabitsIdRoute = AppHabitsIdRouteImport.update({
+  id: '/habits/$id',
+  path: '/habits/$id',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/auth/signup': typeof AuthSignupRoute
-  '/habits/$id': typeof HabitsIdRoute
-  '/email': typeof EmailIndexRoute
-  '/files': typeof FilesIndexRoute
-  '/finances': typeof FinancesIndexRoute
-  '/habits': typeof HabitsIndexRoute
-  '/todos': typeof TodosIndexRoute
+  '/app/habits/$id': typeof AppHabitsIdRoute
+  '/app/email': typeof AppEmailIndexRoute
+  '/app/files': typeof AppFilesIndexRoute
+  '/app/finances': typeof AppFinancesIndexRoute
+  '/app/habits': typeof AppHabitsIndexRoute
+  '/app/todos': typeof AppTodosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/auth/signup': typeof AuthSignupRoute
-  '/habits/$id': typeof HabitsIdRoute
-  '/email': typeof EmailIndexRoute
-  '/files': typeof FilesIndexRoute
-  '/finances': typeof FinancesIndexRoute
-  '/habits': typeof HabitsIndexRoute
-  '/todos': typeof TodosIndexRoute
+  '/app/habits/$id': typeof AppHabitsIdRoute
+  '/app/email': typeof AppEmailIndexRoute
+  '/app/files': typeof AppFilesIndexRoute
+  '/app/finances': typeof AppFinancesIndexRoute
+  '/app/habits': typeof AppHabitsIndexRoute
+  '/app/todos': typeof AppTodosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/auth/signup': typeof AuthSignupRoute
-  '/habits/$id': typeof HabitsIdRoute
-  '/email/': typeof EmailIndexRoute
-  '/files/': typeof FilesIndexRoute
-  '/finances/': typeof FinancesIndexRoute
-  '/habits/': typeof HabitsIndexRoute
-  '/todos/': typeof TodosIndexRoute
+  '/app/habits/$id': typeof AppHabitsIdRoute
+  '/app/email/': typeof AppEmailIndexRoute
+  '/app/files/': typeof AppFilesIndexRoute
+  '/app/finances/': typeof AppFinancesIndexRoute
+  '/app/habits/': typeof AppHabitsIndexRoute
+  '/app/todos/': typeof AppTodosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/auth/signup'
-    | '/habits/$id'
-    | '/email'
-    | '/files'
-    | '/finances'
-    | '/habits'
-    | '/todos'
+    | '/app/habits/$id'
+    | '/app/email'
+    | '/app/files'
+    | '/app/finances'
+    | '/app/habits'
+    | '/app/todos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app'
     | '/auth/signup'
-    | '/habits/$id'
-    | '/email'
-    | '/files'
-    | '/finances'
-    | '/habits'
-    | '/todos'
+    | '/app/habits/$id'
+    | '/app/email'
+    | '/app/files'
+    | '/app/finances'
+    | '/app/habits'
+    | '/app/todos'
   id:
     | '__root__'
     | '/'
+    | '/app'
     | '/auth/signup'
-    | '/habits/$id'
-    | '/email/'
-    | '/files/'
-    | '/finances/'
-    | '/habits/'
-    | '/todos/'
+    | '/app/habits/$id'
+    | '/app/email/'
+    | '/app/files/'
+    | '/app/finances/'
+    | '/app/habits/'
+    | '/app/todos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthSignupRoute: typeof AuthSignupRoute
-  HabitsIdRoute: typeof HabitsIdRoute
-  EmailIndexRoute: typeof EmailIndexRoute
-  FilesIndexRoute: typeof FilesIndexRoute
-  FinancesIndexRoute: typeof FinancesIndexRoute
-  HabitsIndexRoute: typeof HabitsIndexRoute
-  TodosIndexRoute: typeof TodosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/todos/': {
-      id: '/todos/'
-      path: '/todos'
-      fullPath: '/todos'
-      preLoaderRoute: typeof TodosIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/habits/': {
-      id: '/habits/'
-      path: '/habits'
-      fullPath: '/habits'
-      preLoaderRoute: typeof HabitsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/finances/': {
-      id: '/finances/'
-      path: '/finances'
-      fullPath: '/finances'
-      preLoaderRoute: typeof FinancesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/files/': {
-      id: '/files/'
-      path: '/files'
-      fullPath: '/files'
-      preLoaderRoute: typeof FilesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/email/': {
-      id: '/email/'
-      path: '/email'
-      fullPath: '/email'
-      preLoaderRoute: typeof EmailIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/habits/$id': {
-      id: '/habits/$id'
-      path: '/habits/$id'
-      fullPath: '/habits/$id'
-      preLoaderRoute: typeof HabitsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -192,18 +164,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/todos/': {
+      id: '/app/todos/'
+      path: '/todos'
+      fullPath: '/app/todos'
+      preLoaderRoute: typeof AppTodosIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/habits/': {
+      id: '/app/habits/'
+      path: '/habits'
+      fullPath: '/app/habits'
+      preLoaderRoute: typeof AppHabitsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/finances/': {
+      id: '/app/finances/'
+      path: '/finances'
+      fullPath: '/app/finances'
+      preLoaderRoute: typeof AppFinancesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/files/': {
+      id: '/app/files/'
+      path: '/files'
+      fullPath: '/app/files'
+      preLoaderRoute: typeof AppFilesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/email/': {
+      id: '/app/email/'
+      path: '/email'
+      fullPath: '/app/email'
+      preLoaderRoute: typeof AppEmailIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/habits/$id': {
+      id: '/app/habits/$id'
+      path: '/habits/$id'
+      fullPath: '/app/habits/$id'
+      preLoaderRoute: typeof AppHabitsIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppHabitsIdRoute: typeof AppHabitsIdRoute
+  AppEmailIndexRoute: typeof AppEmailIndexRoute
+  AppFilesIndexRoute: typeof AppFilesIndexRoute
+  AppFinancesIndexRoute: typeof AppFinancesIndexRoute
+  AppHabitsIndexRoute: typeof AppHabitsIndexRoute
+  AppTodosIndexRoute: typeof AppTodosIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppHabitsIdRoute: AppHabitsIdRoute,
+  AppEmailIndexRoute: AppEmailIndexRoute,
+  AppFilesIndexRoute: AppFilesIndexRoute,
+  AppFinancesIndexRoute: AppFinancesIndexRoute,
+  AppHabitsIndexRoute: AppHabitsIndexRoute,
+  AppTodosIndexRoute: AppTodosIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
   AuthSignupRoute: AuthSignupRoute,
-  HabitsIdRoute: HabitsIdRoute,
-  EmailIndexRoute: EmailIndexRoute,
-  FilesIndexRoute: FilesIndexRoute,
-  FinancesIndexRoute: FinancesIndexRoute,
-  HabitsIndexRoute: HabitsIndexRoute,
-  TodosIndexRoute: TodosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

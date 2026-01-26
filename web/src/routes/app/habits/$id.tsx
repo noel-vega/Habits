@@ -18,7 +18,7 @@ import type { Contribution, HabitWithContributions } from '@/features/habits/typ
 import { DeleteHabitDialog } from '@/features/habits/components/delete-habit-dialog'
 import { useDialog } from '@/hooks'
 
-export const Route = createFileRoute('/habits/$id')({
+export const Route = createFileRoute('/app/habits/$id')({
   params: {
     parse: z.object({ id: z.coerce.number() }).parse
   },

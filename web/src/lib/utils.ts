@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { startOfWeek, endOfWeek, eachDayOfInterval, getDayOfYear, addDays } from 'date-fns';
+import { getDayOfYear, addDays } from 'date-fns';
 import type { HabitWithContributions } from "@/features/habits/types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -15,17 +15,6 @@ export function getDaysAround(date: Date = new Date(), range: number) {
   }
   return days
 }
-
-export function getWeekDays(days: number) {
-  const today = new Date();
-
-  const weekDays = eachDayOfInterval({
-    start: startOfWeek(today, { weekStartsOn: 1 }), // 1 = Monday
-    end: endOfWeek(today, { weekStartsOn: 1 }),
-  });
-  return weekDays
-}
-
 
 export function getCompletedHabits(params: { day: Date, habits: HabitWithContributions[] }) {
   if (params.habits.length === 0) {
