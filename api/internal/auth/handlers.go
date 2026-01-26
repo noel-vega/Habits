@@ -2,6 +2,7 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,10 @@ func (h *Handler) SignUp(c *gin.Context) {
 
 	err = h.UserService.CreateUser(data)
 	if err != nil {
+		if errors.Is(err, users.ErrEmailExists) {
+			c.AbortWithError(http.StatusConflict, err)
+			return
+		}
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

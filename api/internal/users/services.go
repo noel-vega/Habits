@@ -1,6 +1,12 @@
 package users
 
-import "github.com/jmoiron/sqlx"
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type UserService struct {
 	UserRepo *UserRepo
@@ -14,12 +20,16 @@ func NewUserService(db *sqlx.DB) *UserService {
 
 func (svc *UserService) CreateUser(params CreateUserParams) error {
 	existingUser, err := svc.UserRepo.GetUserByEmail(params.Email)
+	fmt.Printf("USER: %v+\n", existingUser)
+
 	if err != nil {
-		return err
+		if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
 	}
 
 	if existingUser != nil {
-		return err
+		return fmt.Errorf("%s:%w", params.Email, ErrEmailExists)
 	}
 
 	err = svc.UserRepo.CreateUser(params)

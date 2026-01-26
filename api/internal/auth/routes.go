@@ -8,5 +8,5 @@ import (
 func AttachRoutes(r *gin.Engine, db *sqlx.DB) {
 	h := NewHandler(db)
 
-	r.GET("/auth/signup", h.SignUp)
+	r.POST("/auth/signup", h.SignUp)
 }

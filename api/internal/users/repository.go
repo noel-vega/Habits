@@ -14,7 +14,7 @@ func NewUserRepo(db *sqlx.DB) *UserRepo {
 
 func (r *UserRepo) GetUserByEmail(email string) (*UserNoPassword, error) {
 	user := &UserNoPassword{}
-	query := `SELECT * FROM users WHERE email = $1`
+	query := `SELECT id, first_name, last_name, email, created_at, updated_at FROM users WHERE email = $1`
 	err := r.DB.Get(user, query, email)
 	if err != nil {
 		return nil, err
