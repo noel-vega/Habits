@@ -8,16 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/noel-vega/habits/api/internal/users"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
 	UserService *users.UserService
+	AuthService *AuthService
 }
 
 func NewHandler(db *sqlx.DB) *Handler {
 	return &Handler{
-		UserService: users.NewUserService(db),
+		AuthService: NewAuthService(db),
 	}
 }
 
@@ -29,15 +29,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	password := string(bytes)
-	data.Password = password
-
-	err = h.UserService.CreateUser(data)
+	token, err := h.AuthService.SignUp(data)
 	if err != nil {
 		if errors.Is(err, users.ErrEmailExists) {
 			c.AbortWithError(http.StatusConflict, err)
@@ -46,4 +38,21 @@ func (h *Handler) SignUp(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
+}
+
+func (h *Handler) SignIn(c *gin.Context) {
+	var data SignInParams
+	c.Bind(data)
+	token, err := h.AuthService.SignIn(data)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }
