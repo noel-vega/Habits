@@ -22,3 +22,22 @@ func (r *UserRepo) GetUserByEmail(email string) (*UserNoPassword, error) {
 
 	return user, nil
 }
+
+type CreateUserParams struct {
+	FirstName string `json:"firstName" db:"first_name"`
+	LastName  string `json:"lastName" db:"last_name"`
+	Email     string `json:"email" db:"email"`
+}
+
+func (r *UserRepo) CreateUser(params CreateUserParams) error {
+	query := `
+	   INSERT INTO users (first_name, last_name, email) 
+	   VALUES (:first_name, :last_name, :email) 
+	`
+
+	_, err := r.DB.NamedExec(query, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
