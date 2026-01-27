@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { SignInForm } from '@/features/auth/components/sign-in-form'
+import { useAuth } from '@/features/auth/store'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/auth/signin')({
@@ -25,6 +26,9 @@ function RouteComponent() {
           </Link>
         </Button>
       </div>
+      <Button onClick={() => {
+        console.log(useAuth.getState())
+      }}>Auth</Button>
     </div>
   )
 }
