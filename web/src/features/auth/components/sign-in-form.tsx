@@ -7,6 +7,8 @@ import type { FormEvent } from "react"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod/v3"
 import { signIn } from "../api"
+import { useAuth } from "../store"
+import { useNavigate } from "@tanstack/react-router"
 
 const SignInDataSchema = z.object({
   email: z.string().min(1, { message: "Required" }),
@@ -17,6 +19,7 @@ type SignInFormData = z.infer<typeof SignInDataSchema>
 
 
 export function SignInForm() {
+  const navigate = useNavigate()
   const form = useForm<SignInFormData>({
     resolver: zodResolver(SignInDataSchema),
     defaultValues: {
@@ -27,6 +30,12 @@ export function SignInForm() {
 
   const signInMutation = useMutation({
     mutationFn: signIn,
+    onSuccess: ({ token }) => {
+      useAuth.setState({ token })
+      console.log(useAuth.getState())
+      console.log("Navigating")
+      navigate({ to: "/app/habits" })
+    }
   })
 
   const handleSubmit = (e: FormEvent) => {
@@ -34,6 +43,7 @@ export function SignInForm() {
       signInMutation.mutate(data)
     })(e)
   }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 @container/form">
       {signInMutation.error && (
@@ -43,7 +53,6 @@ export function SignInForm() {
       )}
 
       <FieldGroup>
-
         <Controller control={form.control} name="email"
           render={({ field, fieldState }) => {
             return (
