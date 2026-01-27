@@ -51,7 +51,6 @@ func (handler *Handler) GetHabitByID(c *gin.Context) {
 }
 
 func (handler *Handler) ListHabits(c *gin.Context) {
-	// Return JSON response
 	habitsWithContributions := []HabitWithContributions{}
 	habits := handler.HabitRepo.ListHabits()
 	for _, h := range habits {
