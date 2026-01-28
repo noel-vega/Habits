@@ -11,6 +11,7 @@ import { TodaysProgress } from '@/features/habits/components/today-progress'
 import { WeekdayIndicator } from '@/features/habits/components/week-day-indicator'
 import { Page } from '@/components/page'
 
+
 export const Route = createFileRoute('/app/habits/')({
   loader: async ({ context: { queryClient } }) => {
     const habits = await queryClient.ensureQueryData(getListHabitsQueryOptions())
