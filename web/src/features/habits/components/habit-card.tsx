@@ -22,6 +22,7 @@ import { DynamicIcon } from "@/components/ui/dynamic-icon"
 
 // TODO: the contributions map should not be the day of year
 function HabitContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
+  console.log("habit contributions button")
   const contributionsDialog = useDialog()
   const { habit, contributions } = props
   const todaysContribution = contributions.get(getDayOfYear(new Date()))
@@ -33,10 +34,19 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
 
   const updateCompletionsMutation = useMutation({
     mutationFn: updateContributionCompletions,
-    onSuccess: invalidateListHabits
+    onSuccess: () => {
+      console.log("hello")
+      invalidateListHabits()
+      console.log(todaysContribution?.completions)
+      if (habit.completionsPerDay === todaysContribution?.completions) {
+        contributionsDialog.close()
+
+      }
+    }
   })
 
   const handleContribution = async (e: MouseEvent) => {
+    console.log("handleContribution")
     e.preventDefault()
     e.stopPropagation()
     if (habit.completionType === "custom") {
@@ -70,7 +80,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipContent}
         data-tooltip-place="top"
-        className="cursor-pointer relative h-fit grid place-content-center" onClick={handleContribution}>
+        className="cursor-pointer border-2 shadow hover:bg-secondary active:shadow-none p-4 rounded-xl  relative h-fit grid place-content-center" onClick={handleContribution}>
         {progress !== 100 ? (
           <PlusIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />
         ) : (
@@ -79,16 +89,17 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
         <CircularProgress progress={progress} size={60} strokeWidth={5} showPercentage={false} />
       </button>
       <CustomContributionCompletionsDialog
+        {...contributionsDialog}
         date={new Date()}
         habit={props.habit}
-        {...contributionsDialog}
         contribution={todaysContribution}
+        onComplete={() => contributionsDialog.close()}
       />
     </>
   )
 }
 
-export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; } & DialogProps) {
+export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; onComplete: () => void } & DialogProps) {
   const [completions, setCompletions] = useState(props.contribution?.completions ?? 0)
   const [incrementBy, setIncremetBy] = useState(1)
 
@@ -130,40 +141,44 @@ export function CustomContributionCompletionsDialog(props: { date: Date; contrib
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     handleChange(e.currentTarget.valueAsNumber)
 
-  const handleComplete = () =>
+  const handleComplete = () => {
     handleChange(props.habit.completionsPerDay)
+    props.onOpenChange(false)
+  }
 
   const handleReset = () =>
     handleChange(0)
+
+  const isComplete = props.habit.completionsPerDay === props.contribution?.completions
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent onClick={e => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Badge variant="outline">
-              <CalendarIcon />
-              {getDayOfYear(new Date()) === getDayOfYear(props.date) ? "Today" : format(props.date, "MMMM do")}
-            </Badge>
-            <Badge variant="outline">{props.habit.name}</Badge>
+            {props.habit.name}
+            {isComplete && <Badge className="bg-green-100 border border-green-500 text-green-800" >Complete</Badge>}
           </DialogTitle>
           <DialogDescription className="hidden">
             Todays Completions
           </DialogDescription>
-          <Progress value={progress} className="h-3" />
+          <Progress className="h-3" value={progress} />
         </DialogHeader>
         <FieldLabel>Completions</FieldLabel>
 
         <ButtonGroup className="w-full" >
-          <Button variant="secondary" onClick={() => {
-            const newValue = completions - incrementBy
-            const value = newValue < 0 ? 0 : newValue
-            handleChange(value)
-          }}>
+          <Button
+            disabled={!props.contribution?.completions}
+            variant="secondary" onClick={() => {
+              const newValue = completions - incrementBy
+              const value = newValue < 0 ? 0 : newValue
+              handleChange(value)
+            }}>
             <MinusIcon />
           </Button>
           <Input type="number" className="text-center" value={completions} onChange={handleInputChange} />
           <Button variant="secondary"
+            disabled={isComplete}
             onClick={() => {
               const newValue = completions + incrementBy
               const value = newValue > props.habit.completionsPerDay ? props.habit.completionsPerDay : newValue
@@ -183,8 +198,8 @@ export function CustomContributionCompletionsDialog(props: { date: Date; contrib
         </ToggleGroup>
 
         <DialogFooter>
-          <Button variant="secondary" className="flex-1" onClick={handleReset}>Reset</Button>
-          <Button variant="secondary" className="flex-1" onClick={handleComplete}>Complete</Button>
+          <Button disabled={(props.contribution?.completions ?? 0) === 0} variant="secondary" className="flex-1" onClick={handleReset}>Reset</Button>
+          <Button disabled={isComplete} variant="secondary" className="flex-1" onClick={handleComplete}>Complete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
