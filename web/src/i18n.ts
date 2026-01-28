@@ -7,12 +7,24 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   en: {
     translation: {
-      "Habits": "Habits"
+      "Habits": "Habits",
+      "Habit": "Habit",
+      "Settings": "Settings",
+      "Language": "Language",
+      "Home": "Home",
+      "Todos": "Todos",
+      "Finances": "Finances"
     }
   },
   es: {
     translation: {
-      "Habits": "Hábitos"
+      "Habits": "Hábitos",
+      "Habit": "Hábito",
+      "Settings": "Ajustes",
+      "Language": "Idioma",
+      "Home": "Casa",
+      "Todos": "Tareas",
+      "Finances": "Finanzas"
     }
   }
 };
@@ -21,7 +33,7 @@ i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     resources,
-    lng: "es", // language to use, more information here: https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
+    lng: "en", // language to use, more information here: https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
     // you can use the i18n.changeLanguage function to change the language manually: https://www.i18next.com/overview/api#changelanguage
     // if you're using a language detector, do not define the lng option
 

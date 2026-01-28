@@ -14,6 +14,7 @@ import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
+import { Route as AppUserIndexRouteImport } from './routes/app/user/index'
 import { Route as AppTodosIndexRouteImport } from './routes/app/todos/index'
 import { Route as AppHabitsIndexRouteImport } from './routes/app/habits/index'
 import { Route as AppFinancesIndexRouteImport } from './routes/app/finances/index'
@@ -45,6 +46,11 @@ const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/signin',
   path: '/signin',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+const AppUserIndexRoute = AppUserIndexRouteImport.update({
+  id: '/user/',
+  path: '/user/',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppTodosIndexRoute = AppTodosIndexRouteImport.update({
   id: '/todos/',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/app/finances': typeof AppFinancesIndexRoute
   '/app/habits': typeof AppHabitsIndexRoute
   '/app/todos': typeof AppTodosIndexRoute
+  '/app/user': typeof AppUserIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/app/finances': typeof AppFinancesIndexRoute
   '/app/habits': typeof AppHabitsIndexRoute
   '/app/todos': typeof AppTodosIndexRoute
+  '/app/user': typeof AppUserIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/app/finances/': typeof AppFinancesIndexRoute
   '/app/habits/': typeof AppHabitsIndexRoute
   '/app/todos/': typeof AppTodosIndexRoute
+  '/app/user/': typeof AppUserIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/app/finances'
     | '/app/habits'
     | '/app/todos'
+    | '/app/user'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/app/finances'
     | '/app/habits'
     | '/app/todos'
+    | '/app/user'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/app/finances/'
     | '/app/habits/'
     | '/app/todos/'
+    | '/app/user/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -201,6 +213,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/signin'
       preLoaderRoute: typeof AuthSigninRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/app/user/': {
+      id: '/app/user/'
+      path: '/user'
+      fullPath: '/app/user'
+      preLoaderRoute: typeof AppUserIndexRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/app/todos/': {
       id: '/app/todos/'
@@ -254,6 +273,7 @@ interface AppRouteRouteChildren {
   AppFinancesIndexRoute: typeof AppFinancesIndexRoute
   AppHabitsIndexRoute: typeof AppHabitsIndexRoute
   AppTodosIndexRoute: typeof AppTodosIndexRoute
+  AppUserIndexRoute: typeof AppUserIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -263,6 +283,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppFinancesIndexRoute: AppFinancesIndexRoute,
   AppHabitsIndexRoute: AppHabitsIndexRoute,
   AppTodosIndexRoute: AppTodosIndexRoute,
+  AppUserIndexRoute: AppUserIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

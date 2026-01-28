@@ -11,6 +11,7 @@ import {
 import { Link } from "@tanstack/react-router"
 import { BanknoteIcon, FilesIcon, HomeIcon, ListIcon, MailIcon, SproutIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { useTranslation } from "react-i18next"
 
 const items = [
   {
@@ -46,6 +47,7 @@ const items = [
   },
 ]
 export function AppSidebar() {
+  const { t } = useTranslation()
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -59,7 +61,7 @@ export function AppSidebar() {
                       className: "font-semibold border-border"
                     }}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span>{t(item.title)}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -76,7 +78,7 @@ export function AppSidebar() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 
             >
-              <Link to={"/"}>
+              <Link to={"/app/user"}>
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                   <AvatarFallback>NV</AvatarFallback>

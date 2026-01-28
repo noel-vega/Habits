@@ -10,6 +10,7 @@ import { format } from 'date-fns'
 import { TodaysProgress } from '@/features/habits/components/today-progress'
 import { WeekdayIndicator } from '@/features/habits/components/week-day-indicator'
 import { Page } from '@/components/page'
+import { useTranslation } from 'react-i18next'
 
 
 export const Route = createFileRoute('/app/habits/')({
@@ -21,6 +22,7 @@ export const Route = createFileRoute('/app/habits/')({
 })
 
 function RouteComponent() {
+  const { t } = useTranslation()
   const loaderData = Route.useLoaderData()
   const habits = useQuery({ ...getListHabitsQueryOptions(), initialData: loaderData.habits })
 
@@ -36,7 +38,7 @@ function RouteComponent() {
             <PlusIcon /><span>Routine</span>
           </Button>
           <Button variant="secondary" className="flex-1 @md:flex-none" onClick={createHabitDialog.handleOpenDialog}>
-            <PlusIcon /><span>Habit</span>
+            <PlusIcon /><span>{t("Habit")}</span>
           </Button>
         </header>
         <CreateHabitDialogDrawer {...createHabitDialog} />
