@@ -28,7 +28,7 @@ func main() {
 	auth.AttachRoutes(router, db)
 
 	protected := router.Group("/")
-	protected.Use(middlewares.Guard)
+	protected.Use(middlewares.Guard(db))
 	users.AttachRoutes(protected, db)
 	habit.AttachRoutes(protected, db)
 	todos.AttachRoutes(protected, db)

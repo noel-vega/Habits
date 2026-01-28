@@ -3,6 +3,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -54,7 +55,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 	}
 
 	c.SetCookie(
-		"refreshToken",     // name
+		"refresh_token",    // name
 		token.RefreshToken, // value
 		60*60*24*7,         // maxAge (seconds) - e.g., 7 days
 		"/",                // path
@@ -65,5 +66,24 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"accessToken": token.AccessToken,
+	})
+}
+
+func (h *Handler) RefreshAccessToken(c *gin.Context) {
+	refreshTokenStr, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token: " + err.Error()})
+		return
+	}
+	fmt.Println("RefreshAccessToken")
+
+	accessToken, err := h.AuthService.RefreshAccessToken(refreshTokenStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token: " + err.Error()})
+		return
+	}
+	fmt.Println("AccessToken Made")
+	c.JSON(http.StatusOK, gin.H{
+		"accessToken": accessToken,
 	})
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -35,6 +36,22 @@ func (s *AuthService) GenerateToken(userID int, duration time.Duration) (string,
 	return tokenStr, nil
 }
 
+func (s *AuthService) GenerateAccessToken(userID int) (string, error) {
+	token, err := s.GenerateToken(userID, 1*time.Minute)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (s *AuthService) GenerateRefreshToken(userID int) (string, error) {
+	token, err := s.GenerateToken(userID, 1*time.Hour)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
 func (s *AuthService) SignUp(params users.CreateUserParams) (string, error) {
 	hashBytes, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -60,7 +77,7 @@ type SignInParams struct {
 
 type SignInTokenPair struct {
 	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func (s *AuthService) SignIn(params SignInParams) (*SignInTokenPair, error) {
@@ -74,7 +91,7 @@ func (s *AuthService) SignIn(params SignInParams) (*SignInTokenPair, error) {
 	if err != nil {
 		return nil, ErrInvalidCredentials
 	}
-	accessToken, err := s.GenerateToken(user.ID, 1*time.Minute)
+	accessToken, err := s.GenerateAccessToken(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -89,4 +106,37 @@ func (s *AuthService) SignIn(params SignInParams) (*SignInTokenPair, error) {
 		RefreshToken: refreshToken,
 	}
 	return tokens, nil
+}
+
+type Claims struct {
+	UserID int `json:"user_id"`
+	jwt.RegisteredClaims
+}
+
+func (s *AuthService) ValidateToken(tokenStr string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (any, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("invalid claims")
+	}
+	return claims, nil
+}
+
+func (s *AuthService) RefreshAccessToken(refreshToken string) (string, error) {
+	fmt.Println("Begin refresh")
+	claims, err := s.ValidateToken(refreshToken)
+	if err != nil {
+		return "", err
+	}
+	token, err := s.GenerateAccessToken(claims.UserID)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

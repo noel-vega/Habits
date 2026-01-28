@@ -27,6 +27,7 @@ export async function invalidateHabitById(id: number) {
 }
 
 export async function listHabits() {
+
   const { accessToken } = useAuth.getState()
   const res = await fetch("/api/habits", {
     headers: {

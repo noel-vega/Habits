@@ -2,8 +2,8 @@ import { useEffect, useState, type ChangeEvent, type MouseEvent } from "react";
 import type { Contribution, Habit, HabitWithContributions } from "@/features/habits/types";
 import { useMutation } from "@tanstack/react-query";
 import { createContribution, invalidateHabitById, invalidateListHabits, updateContributionCompletions } from "@/features/habits/api";
-import { CalendarIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
-import { format, getDayOfYear } from "date-fns";
+import { CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
+import { getDayOfYear } from "date-fns";
 import { Tooltip } from "react-tooltip";
 import { useDialog } from "@/hooks";
 import { useDebouncedCallback } from 'use-debounce';
@@ -93,13 +93,12 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
         date={new Date()}
         habit={props.habit}
         contribution={todaysContribution}
-        onComplete={() => contributionsDialog.close()}
       />
     </>
   )
 }
 
-export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; onComplete: () => void } & DialogProps) {
+export function CustomContributionCompletionsDialog(props: { date: Date; contribution?: Contribution; habit: Habit; } & DialogProps) {
   const [completions, setCompletions] = useState(props.contribution?.completions ?? 0)
   const [incrementBy, setIncremetBy] = useState(1)
 

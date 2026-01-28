@@ -3,59 +3,48 @@ package middlewares
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jmoiron/sqlx"
+	"github.com/noel-vega/habits/api/internal/auth"
 )
 
-type Claims struct {
-	UserID int `json:"user_id"`
-	jwt.RegisteredClaims
-}
-
-func Guard(c *gin.Context) {
-	refreshTokenStr, err := c.Cookie("refreshToken")
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token: " + err.Error()})
-	}
-	refreshToken, err := jwt.Parse(refreshTokenStr, func(token *jwt.Token) (any, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token: " + err.Error()})
-		return
-	}
-
-	if !refreshToken.Valid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-		return
-	}
-
-	authHeader := c.GetHeader("Authorization")
-
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (any, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil {
-		if errors.Is(err, jwt.ErrTokenExpired) {
-			fmt.Println("ACCESS TOKEN EXPIRED")
+func Guard(db *sqlx.DB) gin.HandlerFunc {
+	authService := auth.NewAuthService(db)
+	return func(c *gin.Context) {
+		refreshTokenStr, err := c.Cookie("refresh_token")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token: " + err.Error()})
 		}
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token: " + err.Error()})
-		return
-	}
 
-	claims, ok := token.Claims.(*Claims)
-	if !ok || !token.Valid {
-		fmt.Println("TOKEN INVALID")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
-		return
-	}
+		refreshTokenClaims, err := authService.ValidateToken(refreshTokenStr)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token: " + err.Error()})
+		}
 
-	c.Set("user_id", claims.UserID)
-	c.Next()
+		accessTokenStr := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+		accessTokenClaims, err := authService.ValidateToken(accessTokenStr)
+		if err != nil {
+			if errors.Is(err, jwt.ErrTokenExpired) {
+				newAccessToken, err := authService.GenerateToken(refreshTokenClaims.UserID, 1*time.Minute)
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token: " + err.Error()})
+					return
+				}
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"newAccessToken": newAccessToken,
+				})
+				return
+			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token: " + err.Error()})
+			return
+		}
+
+		c.Set("user_id", accessTokenClaims.UserID)
+		c.Next()
+	}
 }

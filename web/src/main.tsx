@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { QueryClientProvider } from "@tanstack/react-query"
@@ -8,7 +7,7 @@ import { routeTree } from './routeTree.gen'
 import { queryClient } from './lib/react-query'
 
 // Create a new router instance
-const router = createRouter({ routeTree, context: { queryClient } })
+const router = createRouter({ routeTree, context: { queryClient, today: new Date() } })
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
@@ -16,8 +15,6 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
 }
-
-
 
 // Render the app
 const rootElement = document.getElementById('root')!

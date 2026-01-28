@@ -32,8 +32,6 @@ export function SignInForm() {
     mutationFn: signIn,
     onSuccess: ({ accessToken }) => {
       useAuth.setState({ accessToken })
-      console.log(useAuth.getState())
-      console.log("Navigating")
       navigate({ to: "/app/habits" })
     }
   })
