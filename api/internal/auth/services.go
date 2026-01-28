@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jmoiron/sqlx"
@@ -19,9 +20,11 @@ func NewAuthService(db *sqlx.DB) *AuthService {
 	}
 }
 
-func (s *AuthService) GenerateToken(userID int) (string, error) {
+func (s *AuthService) GenerateToken(userID int, duration time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
+		"exp":     time.Now().Add(duration).Unix(),
+		"iat":     time.Now().Unix(),
 	})
 
 	// TODO: secret key
@@ -45,7 +48,7 @@ func (s *AuthService) SignUp(params users.CreateUserParams) (string, error) {
 		return "", err
 	}
 
-	return s.GenerateToken(user.ID)
+	return s.GenerateToken(user.ID, 1*time.Minute)
 }
 
 var ErrInvalidCredentials = errors.New("invalid email or password")
@@ -71,12 +74,12 @@ func (s *AuthService) SignIn(params SignInParams) (*SignInTokenPair, error) {
 	if err != nil {
 		return nil, ErrInvalidCredentials
 	}
-	accessToken, err := s.GenerateToken(user.ID)
+	accessToken, err := s.GenerateToken(user.ID, 1*time.Minute)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := s.GenerateToken(user.ID)
+	refreshToken, err := s.GenerateToken(user.ID, 1*time.Hour)
 	if err != nil {
 		return nil, err
 	}

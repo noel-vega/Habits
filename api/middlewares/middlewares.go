@@ -2,6 +2,8 @@
 package middlewares
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -15,6 +17,23 @@ type Claims struct {
 }
 
 func Guard(c *gin.Context) {
+	refreshTokenStr, err := c.Cookie("refreshToken")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token: " + err.Error()})
+	}
+	refreshToken, err := jwt.Parse(refreshTokenStr, func(token *jwt.Token) (any, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token: " + err.Error()})
+		return
+	}
+
+	if !refreshToken.Valid {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		return
+	}
+
 	authHeader := c.GetHeader("Authorization")
 
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
@@ -23,12 +42,16 @@ func Guard(c *gin.Context) {
 		return []byte("secret"), nil
 	})
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			fmt.Println("ACCESS TOKEN EXPIRED")
+		}
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token: " + err.Error()})
 		return
 	}
 
 	claims, ok := token.Claims.(*Claims)
 	if !ok || !token.Valid {
+		fmt.Println("TOKEN INVALID")
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
 		return
 	}
