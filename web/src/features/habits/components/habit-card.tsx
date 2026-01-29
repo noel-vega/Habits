@@ -20,9 +20,50 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { DialogProps } from "@/types";
 import { DynamicIcon } from "@/components/ui/dynamic-icon"
 
+export function HabitCard(props: { habit: HabitWithContributions }) {
+  const { habit } = props
+  const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
+  const todaysContribution = contributions.get(getDayOfYear(new Date()))
+  return (
+    <Card className="p-0 h-32">
+      <CardHeader className="flex items-center p-0 h-full">
+        <CardTitle className="font-normal flex-1 px-6">
+          <div className="flex gap-4">
+            <div className="size-14 border-2 rounded-lg grid place-content-center shrink-0">
+              <DynamicIcon className="size-8" name={habit.icon} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex gap-4">
+                <p className="font-bold text-lg">{habit.name}</p>
+                {todaysContribution?.completions === habit.completionsPerDay && (
+                  <Badge className="bg-green-100 border border-green-500 text-green-800" >Complete</Badge>
+
+                )}
+
+              </div>
+              <CardDescription>{habit.description}</CardDescription>
+            </div>
+          </div>
+        </CardTitle>
+        <HabitContributionButton habit={habit} contributions={contributions} />
+      </CardHeader>
+      {/* <CardFooter> */}
+      {/*   <div className="flex gap-2 items-center text-sm"> */}
+      {/*     <p>3 / 7 this week</p> */}
+      {/*     <DotIcon /> */}
+      {/*     <div className="flex items-center gap-1.5"> */}
+      {/*       <FlameIcon size={16} /> */}
+      {/*       <p>3 day streak</p> */}
+      {/*     </div> */}
+      {/*   </div> */}
+      {/* </CardFooter> */}
+    </Card>
+  )
+}
+
+
 // TODO: the contributions map should not be the day of year
 function HabitContributionButton(props: { habit: Habit, contributions: Map<number, Contribution> }) {
-  console.log("habit contributions button")
   const contributionsDialog = useDialog()
   const { habit, contributions } = props
   const todaysContribution = contributions.get(getDayOfYear(new Date()))
@@ -35,9 +76,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
   const updateCompletionsMutation = useMutation({
     mutationFn: updateContributionCompletions,
     onSuccess: () => {
-      console.log("hello")
       invalidateListHabits()
-      console.log(todaysContribution?.completions)
       if (habit.completionsPerDay === todaysContribution?.completions) {
         contributionsDialog.close()
 
@@ -46,7 +85,6 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
   })
 
   const handleContribution = async (e: MouseEvent) => {
-    console.log("handleContribution")
     e.preventDefault()
     e.stopPropagation()
     if (habit.completionType === "custom") {
@@ -73,6 +111,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
   const progress = !todaysContribution ? 0 : todaysContribution.completions / habit.completionsPerDay * 100
   const tooltipId = `completions-habit-${habit.id}`
   const tooltipContent = `${todaysContribution?.completions ?? 0} / ${habit.completionsPerDay}`
+
   return (
     <>
       <Tooltip id={tooltipId} delayShow={500} />
@@ -80,7 +119,7 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipContent}
         data-tooltip-place="top"
-        className="cursor-pointer border-2 shadow hover:bg-secondary active:shadow-none p-4 rounded-xl  relative h-fit grid place-content-center" onClick={handleContribution}>
+        className="cursor-pointer border-l-2 active:shadow-none p-8 bg-secondary/20 hover:bg-secondary/70  relative h-full grid place-content-center" onClick={handleContribution}>
         {progress !== 100 ? (
           <PlusIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />
         ) : (
@@ -206,38 +245,6 @@ export function CustomContributionCompletionsDialog(props: { date: Date; contrib
 
 }
 
-export function HabitCard(props: { habit: HabitWithContributions }) {
-  const { habit } = props
-  const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
-  return (
-    <Card>
-      <CardHeader className="flex">
-        <CardTitle className="font-normal flex-1">
-          <div className="flex gap-4">
-            <div className="size-14 border-2 rounded-lg grid place-content-center shrink-0">
-              <DynamicIcon className="size-8" name={habit.icon} />
-            </div>
-            <div>
-              <p className="font-bold text-lg">{habit.name}</p>
-              <CardDescription>{habit.description}</CardDescription>
-            </div>
-          </div>
-        </CardTitle>
-        <HabitContributionButton habit={habit} contributions={contributions} />
-      </CardHeader>
-      {/* <CardFooter> */}
-      {/*   <div className="flex gap-2 items-center text-sm"> */}
-      {/*     <p>3 / 7 this week</p> */}
-      {/*     <DotIcon /> */}
-      {/*     <div className="flex items-center gap-1.5"> */}
-      {/*       <FlameIcon size={16} /> */}
-      {/*       <p>3 day streak</p> */}
-      {/*     </div> */}
-      {/*   </div> */}
-      {/* </CardFooter> */}
-    </Card>
-  )
-}
 
 
 
