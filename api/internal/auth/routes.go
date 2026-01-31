@@ -10,6 +10,7 @@ func AttachRoutes(r *gin.Engine, db *sqlx.DB) {
 
 	r.POST("/auth/signup", h.SignUp)
 	r.POST("/auth/signin", h.SignIn)
+	r.GET("/auth/signout", h.SignOut)
 	r.GET("/auth/refresh", h.RefreshAccessToken)
 	r.GET("/auth/me", h.Me)
 }

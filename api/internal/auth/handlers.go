@@ -70,6 +70,18 @@ func (h *Handler) SignIn(c *gin.Context) {
 	})
 }
 
+func (h *Handler) SignOut(c *gin.Context) {
+	c.SetCookie(
+		"refresh_token", // name
+		"",              // value
+		-1,              // maxAge (seconds) - e.g., 7 days
+		"/",             // path
+		"",              // domain (empty = current domain)
+		false,           // secure (HTTPS only)
+		true,            // httpOnly
+	)
+}
+
 func (h *Handler) RefreshAccessToken(c *gin.Context) {
 	refreshTokenStr, err := c.Cookie("refresh_token")
 	if err != nil {

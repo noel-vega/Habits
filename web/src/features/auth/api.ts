@@ -92,3 +92,9 @@ export async function me() {
   }
   return { success: false } as const
 }
+
+export async function signOut() {
+  await fetch("/api/auth/signout", {
+    credentials: "include"
+  })
+}
