@@ -1,4 +1,5 @@
 import z from "zod/v3";
+import { jwtDecode } from "jwt-decode"
 
 
 const SignUpParamsSchema = z.object({
@@ -50,4 +51,20 @@ export async function signIn(params: SignInParams) {
   }
 
   return SignInResponseSchema.parse(await response.json())
+}
+
+export const RefreshTokenResponseSchema = z.object({
+  accessToken: z.string()
+})
+
+export async function refreshAccessToken() {
+  const response = await fetch("/api/auth/refresh", {
+    credentials: "include"
+  })
+
+  if (response.ok) {
+    const { accessToken } = RefreshTokenResponseSchema.parse(await response.json())
+    return { success: true, accessToken } as const
+  }
+  return { success: false } as const
 }

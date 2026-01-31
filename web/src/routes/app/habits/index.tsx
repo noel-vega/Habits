@@ -11,6 +11,7 @@ import { TodaysProgress } from '@/features/habits/components/today-progress'
 import { WeekdayIndicator } from '@/features/habits/components/week-day-indicator'
 import { Page } from '@/components/layout/page'
 import { useTranslation } from 'react-i18next'
+import { refreshAccessToken } from '@/features/auth/api'
 
 
 export const Route = createFileRoute('/app/habits/')({
@@ -29,6 +30,9 @@ function RouteComponent() {
   const createHabitDialog = useDialog()
   return (
     <Page title="Habits">
+      <Button onClick={async () => {
+        refreshAccessToken()
+      }}></Button>
       <div className="max-w-5xl space-y-6 @container">
         <header className="flex items-center gap-4 pb-2">
           <p className="hidden @md:block text-2xl mr-auto font-medium">
