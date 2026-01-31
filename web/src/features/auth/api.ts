@@ -74,6 +74,8 @@ export const MeSchema = z.object({
   email: z.string()
 })
 
+export type Me = z.infer<typeof MeSchema>
+
 const MeResponseSchema = z.object({
   accessToken: z.string(),
   me: MeSchema

@@ -4,6 +4,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -12,13 +13,17 @@ import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { links } from "./links"
+import { useAuth } from "@/features/auth/store"
+import { ChevronsUpDownIcon } from "lucide-react"
 
 export function AppSidebar() {
   const { t } = useTranslation()
+  const { me } = useAuth()
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel>Plannkit</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {links.map((item) => (
@@ -41,16 +46,18 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg"
+            <SidebarMenuButton
+              asChild
+              size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-
             >
-              <Link to={"/app/user"}>
+              <Link to="/app/user">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback>NV</AvatarFallback>
+                  <AvatarImage src="" alt="@shadcn" />
+                  <AvatarFallback className="border">{me.firstName[0]} {me.lastName[0]}</AvatarFallback>
                 </Avatar>
-                <span>Noel Vega</span>
+                <span>{me.firstName} {me.lastName}</span>
+                <ChevronsUpDownIcon className="ml-auto size-4" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

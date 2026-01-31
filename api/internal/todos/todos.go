@@ -7,6 +7,7 @@ import (
 
 type Todo struct {
 	ID          int       `json:"id" db:"id"`
+	UserID      int       `json:"userId" db:"user_id"`
 	Name        string    `json:"name" db:"name"`
 	Status      string    `json:"status" db:"status"`
 	Position    string    `json:"position" db:"position"`

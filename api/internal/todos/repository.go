@@ -19,6 +19,7 @@ func NewTodosRepo(db *sqlx.DB) *TodosRepo {
 }
 
 type GetLastParams struct {
+	UserID int    `json:"userId" db:"user_id"`
 	Status string `json:"status" db:"status"`
 }
 
@@ -39,7 +40,7 @@ func (r *TodosRepo) GetLast(params GetLastParams) (*Todo, error) {
 	return todo, nil
 }
 
-func (r *TodosRepo) GetByID(id int) (*Todo, error) {
+func (r *TodosRepo) GetByID(id int, userID int) (*Todo, error) {
 	query := `
 		SELECT * FROM todos WHERE id = :id 
 	`
@@ -51,7 +52,7 @@ func (r *TodosRepo) GetByID(id int) (*Todo, error) {
 	return todo, nil
 }
 
-func (r *TodosRepo) List() ([]Todo, error) {
+func (r *TodosRepo) List(userID int) ([]Todo, error) {
 	query := `
 		SELECT * FROM todos ORDER BY position ASC
 	`
@@ -64,13 +65,14 @@ func (r *TodosRepo) List() ([]Todo, error) {
 }
 
 type CreateTodoParams struct {
+	UserID      int    `json:"userId" db:"user_id"`
 	Name        string `json:"name" db:"name"`
 	Status      string `json:"status" db:"status"`
 	Description string `json:"description" db:"description"`
 	Position    string `json:"position" db:"position"`
 }
 
-func (r *TodosRepo) Create(params CreateTodoParams) error {
+func (r *TodosRepo) Create(params *CreateTodoParams) error {
 	lastTodo, err := r.GetLast(GetLastParams{
 		Status: params.Status,
 	})
@@ -94,8 +96,8 @@ func (r *TodosRepo) Create(params CreateTodoParams) error {
 	params.Position = position
 
 	query := `
-	   INSERT INTO todos (name, status, description, position) 
-	   VALUES (:name, :status, :description, :position) 
+	   INSERT INTO todos (user_id, name, status, description, position) 
+		 VALUES (:user_id, :name, :status, :description, :position) 
 	`
 	_, err = r.DB.NamedExec(query, params)
 	if err != nil {
@@ -105,6 +107,7 @@ func (r *TodosRepo) Create(params CreateTodoParams) error {
 }
 
 type UpdateTodoParams struct {
+	UserID      int    `json:"userId" db:"user_id"`
 	Name        string `json:"name" db:"name"`
 	Status      string `json:"status" db:"status"`
 	Description string `json:"description" db:"description"`
@@ -125,6 +128,7 @@ func (r *TodosRepo) Update(params UpdateTodoParams) error {
 
 type UpdatePositionParams struct {
 	ID             int    `json:"id"`
+	UserID         int    `json:"userId" db:"user_id"`
 	Status         string `json:"status"`
 	AfterPosition  string `json:"afterPosition"`
 	BeforePosition string `json:"beforePosition"`
@@ -139,18 +143,18 @@ func (r *TodosRepo) UpdatePosition(params UpdatePositionParams) error {
 	query := `
 		UPDATE todos
 	  SET status = $1, position = $2
-	  WHERE id = $3
+	  WHERE id = $3 AND user_id = $4
 	`
-	_, err = r.DB.Exec(query, params.Status, newPosition, params.ID)
+	_, err = r.DB.Exec(query, params.Status, newPosition, params.ID, params.UserID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *TodosRepo) Delete(id int) error {
-	query := `DELETE FROM todos WHERE id = $1`
-	_, err := r.DB.Exec(query, id)
+func (r *TodosRepo) Delete(id int, userID int) error {
+	query := `DELETE FROM todos WHERE id = $1 and user_id = $2`
+	_, err := r.DB.Exec(query, id, userID)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,7 @@ const resources = {
       "Settings": "Settings",
       "Language": "Language",
       "Home": "Home",
-      "Todos": "Todos",
+      "Tasks": "Tasks",
       "Finances": "Finances"
     }
   },
@@ -23,7 +23,7 @@ const resources = {
       "Settings": "Ajustes",
       "Language": "Idioma",
       "Home": "Casa",
-      "Todos": "Tareas",
+      "Tasks": "Tareas",
       "Finances": "Finanzas"
     }
   }

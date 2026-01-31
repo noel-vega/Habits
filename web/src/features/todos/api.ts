@@ -31,7 +31,7 @@ export async function getTodoById(id: number) {
   return TodoSchema.parse(json)
 }
 
-export async function listTodos() {
+export async function listTasks() {
   const headers = getHeaders()
   const res = await fetch("/api/todos", { headers })
   const json = await res.json()
@@ -40,7 +40,7 @@ export async function listTodos() {
 
 export function getListTodosQueryOptions() {
   return queryOptions({
-    queryFn: listTodos,
+    queryFn: listTasks,
     queryKey: ["todos"]
   })
 }

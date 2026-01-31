@@ -11,7 +11,7 @@ export const Route = createFileRoute('/app/user/')({
 function RouteComponent() {
   const { t } = useTranslation()
   return (
-    <Page title="Settings" >
+    <Page title="Account" >
       <Field>
         <FieldLabel>{t("Language")}</FieldLabel>
         <LanguageSelect />

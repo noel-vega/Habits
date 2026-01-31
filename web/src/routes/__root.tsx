@@ -13,9 +13,8 @@ const RootLayout = () => (
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient, today: Date }>()({
   beforeLoad: async ({ location }) => {
     const response = await me()
-    console.log(response)
     if (response.success) {
-      useAuth.setState({ accessToken: response.data.accessToken })
+      useAuth.setState(response.data)
       if (location.pathname.startsWith("/auth")) {
         throw redirect({ to: "/app/habits" })
       }

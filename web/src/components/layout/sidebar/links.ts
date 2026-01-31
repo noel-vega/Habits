@@ -1,10 +1,11 @@
-import { HomeIcon, SproutIcon, ListIcon, BanknoteIcon, MailIcon, FilesIcon } from "lucide-react";
+import { SproutIcon, ListIcon, BanknoteIcon, MailIcon, FilesIcon, LayoutDashboard } from "lucide-react";
 
+// TODO: make urls type safe with router
 export const links = [
   {
-    title: "Home",
-    url: "/",
-    icon: HomeIcon,
+    title: "Dashboard",
+    url: "/app/dashboard",
+    icon: LayoutDashboard,
   },
   {
     title: "Habits",
@@ -12,7 +13,7 @@ export const links = [
     icon: SproutIcon,
   },
   {
-    title: "Todos",
+    title: "Tasks",
     url: "/app/todos",
     icon: ListIcon,
   },

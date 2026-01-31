@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { EllipsisIcon } from "lucide-react"
 import type { Todo } from "@/features/todos/types"
-import { deleteTodo, invalidateListTodosQuery } from "@/features/todos/api"
+import { deleteTodo, invalidateGetBoardQuery } from "@/features/todos/api"
 import { useMutation } from "@tanstack/react-query"
-import type { PropsWithChildren } from "react"
+import type { MouseEvent, PropsWithChildren } from "react"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/utils"
 
@@ -101,11 +101,13 @@ function TodoCardOptionsDropdown({ id, children }: { id: number } & PropsWithChi
   const deleteTodoMutation = useMutation({
     mutationFn: deleteTodo,
     onSuccess: () => {
-      invalidateListTodosQuery()
+      invalidateGetBoardQuery()
     }
   })
 
-  const handleDeleteTodo = () => {
+  const handleDeleteTodo = (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     deleteTodoMutation.mutate({ id })
   }
   return (
