@@ -17,6 +17,7 @@ import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AppUserIndexRouteImport } from './routes/app/user/index'
 import { Route as AppTodosIndexRouteImport } from './routes/app/todos/index'
 import { Route as AppHabitsIndexRouteImport } from './routes/app/habits/index'
+import { Route as AppGroceriesIndexRouteImport } from './routes/app/groceries/index'
 import { Route as AppFinancesIndexRouteImport } from './routes/app/finances/index'
 import { Route as AppEmailIndexRouteImport } from './routes/app/email/index'
 import { Route as AppDocumentsIndexRouteImport } from './routes/app/documents/index'
@@ -62,6 +63,11 @@ const AppHabitsIndexRoute = AppHabitsIndexRouteImport.update({
   path: '/habits/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppGroceriesIndexRoute = AppGroceriesIndexRouteImport.update({
+  id: '/groceries/',
+  path: '/groceries/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppFinancesIndexRoute = AppFinancesIndexRouteImport.update({
   id: '/finances/',
   path: '/finances/',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/app/documents': typeof AppDocumentsIndexRoute
   '/app/email': typeof AppEmailIndexRoute
   '/app/finances': typeof AppFinancesIndexRoute
+  '/app/groceries': typeof AppGroceriesIndexRoute
   '/app/habits': typeof AppHabitsIndexRoute
   '/app/todos': typeof AppTodosIndexRoute
   '/app/user': typeof AppUserIndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/app/documents': typeof AppDocumentsIndexRoute
   '/app/email': typeof AppEmailIndexRoute
   '/app/finances': typeof AppFinancesIndexRoute
+  '/app/groceries': typeof AppGroceriesIndexRoute
   '/app/habits': typeof AppHabitsIndexRoute
   '/app/todos': typeof AppTodosIndexRoute
   '/app/user': typeof AppUserIndexRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/app/documents/': typeof AppDocumentsIndexRoute
   '/app/email/': typeof AppEmailIndexRoute
   '/app/finances/': typeof AppFinancesIndexRoute
+  '/app/groceries/': typeof AppGroceriesIndexRoute
   '/app/habits/': typeof AppHabitsIndexRoute
   '/app/todos/': typeof AppTodosIndexRoute
   '/app/user/': typeof AppUserIndexRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/app/documents'
     | '/app/email'
     | '/app/finances'
+    | '/app/groceries'
     | '/app/habits'
     | '/app/todos'
     | '/app/user'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/app/documents'
     | '/app/email'
     | '/app/finances'
+    | '/app/groceries'
     | '/app/habits'
     | '/app/todos'
     | '/app/user'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/app/documents/'
     | '/app/email/'
     | '/app/finances/'
+    | '/app/groceries/'
     | '/app/habits/'
     | '/app/todos/'
     | '/app/user/'
@@ -235,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHabitsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/groceries/': {
+      id: '/app/groceries/'
+      path: '/groceries'
+      fullPath: '/app/groceries'
+      preLoaderRoute: typeof AppGroceriesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/finances/': {
       id: '/app/finances/'
       path: '/finances'
@@ -271,6 +290,7 @@ interface AppRouteRouteChildren {
   AppDocumentsIndexRoute: typeof AppDocumentsIndexRoute
   AppEmailIndexRoute: typeof AppEmailIndexRoute
   AppFinancesIndexRoute: typeof AppFinancesIndexRoute
+  AppGroceriesIndexRoute: typeof AppGroceriesIndexRoute
   AppHabitsIndexRoute: typeof AppHabitsIndexRoute
   AppTodosIndexRoute: typeof AppTodosIndexRoute
   AppUserIndexRoute: typeof AppUserIndexRoute
@@ -281,6 +301,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDocumentsIndexRoute: AppDocumentsIndexRoute,
   AppEmailIndexRoute: AppEmailIndexRoute,
   AppFinancesIndexRoute: AppFinancesIndexRoute,
+  AppGroceriesIndexRoute: AppGroceriesIndexRoute,
   AppHabitsIndexRoute: AppHabitsIndexRoute,
   AppTodosIndexRoute: AppTodosIndexRoute,
   AppUserIndexRoute: AppUserIndexRoute,
