@@ -90,7 +90,7 @@ export function SignInForm() {
       </FieldGroup>
 
       <div>
-        <Button type="submit" className="w-full" disabled={!form.formState.isValid}>Sign In</Button>
+        <Button type="submit" className="w-full" disabled={!form.formState.isValid || signInMutation.isPending}>Sign In</Button>
       </div>
     </form>
   )
