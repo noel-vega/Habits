@@ -34,7 +34,7 @@ export const links = [
   },
 
   {
-    title: "Files",
+    title: "Documents",
     url: "/app/files",
     icon: FilesIcon,
   },

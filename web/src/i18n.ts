@@ -13,7 +13,22 @@ const resources = {
       "Language": "Language",
       "Home": "Home",
       "Tasks": "Tasks",
-      "Finances": "Finances"
+      "Finances": "Finances",
+      "Groceries": "Groceries",
+      "Documents": "Documents",
+      "Dashboard": "Dashboard",
+      "Shopping List": "Shopping List",
+      "Add": "Add",
+      "Search and add items": "Search and add items",
+      "Catalog": "Catalog",
+      "Search": "Search",
+      "Pieces": "Pieces",
+      "Checkout": "Checkout",
+      "Are you want to checkout?": "Are you want to checkout?",
+      "This will clear all checked items. Checkouts can be viewd in your groceries history.": "This will clear all checked items. Checkouts can be viewd in your groceries history.",
+      "Proceed": "Proceed",
+      "Cancel": "Cancel",
+      "Your grocery list is empty. Add some items.": "Your grocery list is empty. Add some items."
     }
   },
   es: {
@@ -24,7 +39,22 @@ const resources = {
       "Language": "Idioma",
       "Home": "Casa",
       "Tasks": "Tareas",
-      "Finances": "Finanzas"
+      "Finances": "Finanzas",
+      "Groceries": "Comestibles",
+      "Documents": "Documentos",
+      "Dashboard": "Panel",
+      "Shopping List": "Lista de compras",
+      "Add": "Agregar",
+      "Search and add items": "Buscar y añadir artículos",
+      "Catalog": "Catalogar",
+      "Search": "Buscar",
+      "Pieces": "Piezas",
+      "Checkout": "Verificar",
+      "Are you want to checkout?": "¿Quieres pagar?",
+      "This will clear all checked items. Checkouts can be viewd in your groceries history.": "Esto eliminará todos los artículos seleccionados. Las compras realizadas se pueden consultar en tu historial de compras.",
+      "Proceed": "Proceder",
+      "Cancel": "Cancelar",
+      "Your grocery list is empty. Add some items.": "Tu lista de la compra está vacía. Añade algunos artículos."
     }
   }
 };
