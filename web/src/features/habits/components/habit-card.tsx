@@ -25,24 +25,21 @@ export function HabitCard(props: { habit: HabitWithContributions }) {
   const contributions = new Map(props.habit.contributions.map(contrib => [getDayOfYear(contrib.date), contrib]));
   const todaysContribution = contributions.get(getDayOfYear(new Date()))
   return (
-    <Card className="p-0 h-32">
+    <Card className="p-0 h-28">
       <CardHeader className="flex items-center p-0 h-full">
-        <CardTitle className="font-normal flex-1 px-6">
-          <div className="flex gap-4">
-            <div className="size-14 border-2 rounded-lg grid place-content-center shrink-0">
-              <DynamicIcon className="size-8" name={habit.icon} />
-            </div>
-            <div className="space-y-2">
-              <div className="flex gap-4">
-                <p className="font-bold text-lg">{habit.name}</p>
-                {todaysContribution?.completions === habit.completionsPerDay && (
-                  <Badge className="bg-green-100 border border-green-500 text-green-800" >Complete</Badge>
+        <CardTitle className="font-normal flex-1 px-4 flex flex-wrap gap-4 items-center">
+          <div className="size-14 border-2 rounded-lg grid place-content-center shrink-0">
+            <DynamicIcon className="size-4" name={habit.icon} />
+          </div>
+          <div className="space-y-2">
+            <div className="flex gap-4">
+              {todaysContribution?.completions === habit.completionsPerDay && (
+                <Badge className="bg-green-100 border border-green-500 text-green-800" >Complete</Badge>
 
-                )}
+              )}
 
-              </div>
-              <CardDescription>{habit.description}</CardDescription>
             </div>
+            <p className="font-bold text-lg">{habit.name}</p>
           </div>
         </CardTitle>
         <HabitContributionButton habit={habit} contributions={contributions} />
@@ -119,11 +116,11 @@ function HabitContributionButton(props: { habit: Habit, contributions: Map<numbe
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipContent}
         data-tooltip-place="top"
-        className="cursor-pointer border-l-2 active:shadow-none p-8 bg-secondary/20 hover:bg-secondary/70  relative h-full grid place-content-center" onClick={handleContribution}>
+        className="cursor-pointer border-l-2 active:shadow-none p-4 bg-secondary/20 hover:bg-secondary/70  relative h-full grid place-content-center" onClick={handleContribution}>
         {progress !== 100 ? (
-          <PlusIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />
+          <PlusIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" size={24} />
         ) : (
-          <CheckIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 stroke-green-600" />
+          <CheckIcon className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 stroke-green-600" size={24} />
         )}
         <CircularProgress progress={progress} size={60} strokeWidth={5} showPercentage={false} />
       </button>
