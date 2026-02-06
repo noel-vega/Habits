@@ -28,7 +28,10 @@ const resources = {
       "This will clear all checked items. Checkouts can be viewd in your groceries history.": "This will clear all checked items. Checkouts can be viewd in your groceries history.",
       "Proceed": "Proceed",
       "Cancel": "Cancel",
-      "Your grocery list is empty. Add some items.": "Your grocery list is empty. Add some items."
+      "Your grocery list is empty. Add some items.": "Your grocery list is empty. Add some items.",
+      "Item": "Item",
+      "Clear": "Clear",
+      "Add some groceries to your list.": "Add some groceries to your list.",
     }
   },
   es: {
@@ -54,7 +57,9 @@ const resources = {
       "This will clear all checked items. Checkouts can be viewd in your groceries history.": "Esto eliminará todos los artículos seleccionados. Las compras realizadas se pueden consultar en tu historial de compras.",
       "Proceed": "Proceder",
       "Cancel": "Cancelar",
-      "Your grocery list is empty. Add some items.": "Tu lista de la compra está vacía. Añade algunos artículos."
+      "Add some groceries to your list.": "Añade algunos productos de alimentación a tu lista.",
+      "Item": "Artículo",
+      "Clear": "Claro"
     }
   }
 };
