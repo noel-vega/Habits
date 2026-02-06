@@ -3,7 +3,7 @@ import type { FormEvent } from "react"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod/v3"
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { cn } from "@/lib/utils"
 import { PlusIcon } from "lucide-react"
@@ -28,7 +28,6 @@ export function AddItemForm(props: { className?: string, onSubmit: (val: AddItem
 
   const handleSubmit = (e: FormEvent) => {
     form.handleSubmit(data => {
-      console.log("SUBMIT:", data)
       form.reset()
       form.setFocus("name")
       props.onSubmit(data)
@@ -42,7 +41,6 @@ export function AddItemForm(props: { className?: string, onSubmit: (val: AddItem
         control={form.control}
         render={({ field }) => (
           <Field className="flex-1">
-            <FieldLabel>{t("Search")}</FieldLabel>
             <Input placeholder={t("Search and add items")} {...field} />
           </Field>
         )}
@@ -53,7 +51,6 @@ export function AddItemForm(props: { className?: string, onSubmit: (val: AddItem
         control={form.control}
         render={({ field }) => (
           <Field className="max-w-18">
-            <FieldLabel>{t("Pieces")}</FieldLabel>
             <Input type="number"
               {...field}
               onChange={(e) => {
@@ -67,7 +64,7 @@ export function AddItemForm(props: { className?: string, onSubmit: (val: AddItem
         form.setFocus("name")
       }}>
         <PlusIcon />
-        {t("Add")}
+        {t("Item")}
       </Button>
     </form>
   )
