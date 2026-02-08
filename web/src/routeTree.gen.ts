@@ -21,6 +21,7 @@ import { Route as AppGroceriesIndexRouteImport } from './routes/app/groceries/in
 import { Route as AppFinancesIndexRouteImport } from './routes/app/finances/index'
 import { Route as AppEmailIndexRouteImport } from './routes/app/email/index'
 import { Route as AppDocumentsIndexRouteImport } from './routes/app/documents/index'
+import { Route as AppDashboardIndexRouteImport } from './routes/app/dashboard/index'
 import { Route as AppHabitsIdRouteImport } from './routes/app/habits/$id'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -83,6 +84,11 @@ const AppDocumentsIndexRoute = AppDocumentsIndexRouteImport.update({
   path: '/documents/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppHabitsIdRoute = AppHabitsIdRouteImport.update({
   id: '/habits/$id',
   path: '/habits/$id',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/app/habits/$id': typeof AppHabitsIdRoute
+  '/app/dashboard': typeof AppDashboardIndexRoute
   '/app/documents': typeof AppDocumentsIndexRoute
   '/app/email': typeof AppEmailIndexRoute
   '/app/finances': typeof AppFinancesIndexRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/app/habits/$id': typeof AppHabitsIdRoute
+  '/app/dashboard': typeof AppDashboardIndexRoute
   '/app/documents': typeof AppDocumentsIndexRoute
   '/app/email': typeof AppEmailIndexRoute
   '/app/finances': typeof AppFinancesIndexRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/app/habits/$id': typeof AppHabitsIdRoute
+  '/app/dashboard/': typeof AppDashboardIndexRoute
   '/app/documents/': typeof AppDocumentsIndexRoute
   '/app/email/': typeof AppEmailIndexRoute
   '/app/finances/': typeof AppFinancesIndexRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/app/habits/$id'
+    | '/app/dashboard'
     | '/app/documents'
     | '/app/email'
     | '/app/finances'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/app/habits/$id'
+    | '/app/dashboard'
     | '/app/documents'
     | '/app/email'
     | '/app/finances'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/app/habits/$id'
+    | '/app/dashboard/'
     | '/app/documents/'
     | '/app/email/'
     | '/app/finances/'
@@ -275,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDocumentsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/dashboard/': {
+      id: '/app/dashboard/'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/habits/$id': {
       id: '/app/habits/$id'
       path: '/habits/$id'
@@ -287,6 +306,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppHabitsIdRoute: typeof AppHabitsIdRoute
+  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
   AppDocumentsIndexRoute: typeof AppDocumentsIndexRoute
   AppEmailIndexRoute: typeof AppEmailIndexRoute
   AppFinancesIndexRoute: typeof AppFinancesIndexRoute
@@ -298,6 +318,7 @@ interface AppRouteRouteChildren {
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppHabitsIdRoute: AppHabitsIdRoute,
+  AppDashboardIndexRoute: AppDashboardIndexRoute,
   AppDocumentsIndexRoute: AppDocumentsIndexRoute,
   AppEmailIndexRoute: AppEmailIndexRoute,
   AppFinancesIndexRoute: AppFinancesIndexRoute,

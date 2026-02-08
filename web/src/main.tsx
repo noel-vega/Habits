@@ -6,9 +6,10 @@ import { QueryClientProvider } from "@tanstack/react-query"
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 import { queryClient } from './lib/react-query'
+import { getFlags } from './features/_internal/api';
 
 // Create a new router instance
-const router = createRouter({ routeTree, context: { queryClient, today: new Date() } })
+const router = createRouter({ routeTree, context: { queryClient, today: new Date(), flags: await getFlags() } })
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
