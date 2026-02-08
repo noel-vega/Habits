@@ -3,6 +3,8 @@ import { createRootRouteWithContext, Outlet, redirect } from '@tanstack/react-ro
 import type { QueryClient } from '@tanstack/react-query'
 import { useAuth } from "@/features/auth/store"
 import { me } from "@/features/auth/api"
+import type { Flags } from "@/features/_internal/api"
+import { PageNotFound } from "@/components/page-not-found"
 
 const RootLayout = () => (
   <div className="h-dvh">
@@ -10,7 +12,7 @@ const RootLayout = () => (
   </div>
 )
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient, today: Date }>()({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient, today: Date, flags: Flags }>()({
   beforeLoad: async ({ location }) => {
     const response = await me()
     if (response.success) {
@@ -22,5 +24,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient, toda
       throw redirect({ to: "/auth/signin" })
     }
   },
-  component: RootLayout
+  component: RootLayout,
+  notFoundComponent: PageNotFound
 })
