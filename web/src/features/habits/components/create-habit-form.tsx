@@ -41,7 +41,6 @@ export function CreateHabitForm(props: CreateHabitFormProps) {
   })
 
   const handleSubmit = (e: FormEvent) => {
-    console.log(form.formState.errors)
     form.handleSubmit(async data => {
       createHabitMutation.mutate(data, {
         onSuccess: (newHabit) => {

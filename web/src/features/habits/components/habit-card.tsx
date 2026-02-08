@@ -8,7 +8,7 @@ import { Tooltip } from "react-tooltip";
 import { useDialog } from "@/hooks";
 import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup } from "@/components/ui/button-group";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { CircularProgress } from "@/components/ui/circle-progress";
 import { FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";

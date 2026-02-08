@@ -1,11 +1,10 @@
 import { cn } from "@/lib/utils"
 import type { GroceryListItem } from "../types"
-import { CheckIcon, MinusIcon, MoreVerticalIcon, PlusIcon, Trash2Icon } from "lucide-react"
+import { CheckIcon, MinusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import type { MouseEvent } from "react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "react-i18next"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 type Props = {
   onClick: (e: MouseEvent) => void
@@ -51,7 +50,7 @@ export function GroceryListitem({ item, ...props }: Props) {
             </Button>
           </div>
           <AlertDialog>
-            <AlertDialogTrigger asChild className="flex gap-2 stroke-red-500  hover:text-red-500 hover:bg-red-100 hover:border-red-500 hidden" onClick={e => e.stopPropagation()} >
+            <AlertDialogTrigger asChild className="gap-2 stroke-red-500  hover:text-red-500 hover:bg-red-100 hover:border-red-500 hidden" onClick={e => e.stopPropagation()} >
               <Button variant="outline" size="icon">
                 <Trash2Icon />
               </Button>
